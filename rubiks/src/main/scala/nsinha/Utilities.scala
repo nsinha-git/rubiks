@@ -1,6 +1,22 @@
 package nsinha
 
+import scala.collection.immutable.Range
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
 object Utilities {
+
+  def getAllPos(n: Int) = {
+
+    val allPos = ListBuffer[(Int, Int, Int)]()
+    for (x <- Range(0, n))
+      for (y <- Range(0, n))
+        for (z <- Range(0, n)) {
+          allPos += Tuple3(x, y, z)
+        }
+
+    allPos.toList
+  }
 
   def move(oldPos: (Int, Int, Int), currAxis: Int, from: Int, to: Int, n: Int): Int = {
     /*
@@ -45,99 +61,117 @@ object Utilities {
   }
 
   def fixOrientation(cube: Cube, fromAxis: Int, toAxis: Int) = {
-    if (fromAxis == 1) {
-      if (toAxis == 2) {
-        cube.orientX = orient(cube.orientX, YOrientation)
-        cube.orientY = orient(cube.orientY, MinusXOrientation)
-      } else if (toAxis == -2) {
-        cube.orientX = orient(cube.orientX, MinusYOrientation)
-        cube.orientY = orient(cube.orientY, XOrientation)
-      } else if (toAxis == 3) {
-        cube.orientX = orient(cube.orientX, ZOrientation)
-        cube.orientZ = orient(cube.orientZ, MinusXOrientation)
-      } else if (toAxis == -3) {
-        cube.orientX = orient(cube.orientX, MinusZOrientation)
-        cube.orientZ = orient(cube.orientZ, XOrientation)
-      }
-    }
+    cube.orientX = orient(cube.orientX, fromAxis, toAxis)
+    cube.orientY = orient(cube.orientY, fromAxis, toAxis)
+    cube.orientZ = orient(cube.orientZ, fromAxis, toAxis)
+  }
 
-    if (fromAxis == 2) {
-      if (toAxis == 1) {
-        cube.orientY = orient(cube.orientY, XOrientation)
-        cube.orientX = orient(cube.orientX, MinusYOrientation)
-      } else if (toAxis == -1) {
-        cube.orientY = orient(cube.orientY, MinusXOrientation)
-        cube.orientX = orient(cube.orientX, YOrientation)
-      } else if (toAxis == 3) {
-        cube.orientY = orient(cube.orientY, ZOrientation)
-        cube.orientZ = orient(cube.orientZ, MinusYOrientation)
-      } else if (toAxis == -3) {
-        cube.orientY = orient(cube.orientY, MinusZOrientation)
-        cube.orientZ = orient(cube.orientZ, YOrientation)
+  def orient(orig: Orientation, from: Int, to: Int): Orientation = {
+    if (from == to) return orig
+    (from, to) match {
+      case (1,2) => orig match {
+        case XOrientation => YOrientation
+        case YOrientation => MinusXOrientation
+        case ZOrientation => ZOrientation
+        case MinusXOrientation => MinusYOrientation
+        case MinusYOrientation => XOrientation
+        case MinusZOrientation => MinusZOrientation
       }
-    }
-
-    if (fromAxis == 3) {
-      if (toAxis == 2) {
-        cube.orientZ = orient(cube.orientZ, YOrientation)
-        cube.orientY = orient(cube.orientY, MinusZOrientation)
-      } else if (toAxis == -2) {
-        cube.orientZ = orient(cube.orientZ, MinusYOrientation)
-        cube.orientY = orient(cube.orientY, ZOrientation)
-      } else if (toAxis == 1) {
-        cube.orientZ = orient(cube.orientZ, XOrientation)
-        cube.orientX = orient(cube.orientX, MinusZOrientation)
-      } else if (toAxis == -1) {
-        cube.orientZ = orient(cube.orientZ, MinusXOrientation)
-        cube.orientX = orient(cube.orientX, ZOrientation)
+      case (1,3) => orig match {
+        case XOrientation => ZOrientation
+        case YOrientation => YOrientation
+        case ZOrientation => MinusXOrientation
+        case MinusXOrientation => MinusZOrientation
+        case MinusYOrientation => MinusYOrientation
+        case MinusZOrientation => XOrientation
+      }
+      case (2,1) => orig match {
+        case XOrientation => MinusYOrientation
+        case YOrientation => XOrientation
+        case ZOrientation => ZOrientation
+        case MinusXOrientation => YOrientation
+        case MinusYOrientation => MinusXOrientation
+        case MinusZOrientation => MinusZOrientation
+      }
+      case (2,3) => orig match {
+        case XOrientation => XOrientation
+        case YOrientation => ZOrientation
+        case ZOrientation => MinusYOrientation
+        case MinusXOrientation => MinusXOrientation
+        case MinusYOrientation => MinusZOrientation
+        case MinusZOrientation => YOrientation
+      }
+      case (3,1) => orig match {
+        case XOrientation => MinusZOrientation
+        case YOrientation => YOrientation
+        case ZOrientation => XOrientation
+        case MinusXOrientation => ZOrientation
+        case MinusYOrientation => MinusYOrientation
+        case MinusZOrientation => MinusXOrientation
+      }
+      case (3,2) => orig match {
+        case XOrientation => XOrientation
+        case YOrientation => MinusZOrientation
+        case ZOrientation => YOrientation
+        case MinusXOrientation => MinusXOrientation
+        case MinusYOrientation => ZOrientation
+        case MinusZOrientation => MinusYOrientation
       }
     }
   }
 
-  def orient(orig: Orientation, rot: Orientation): Orientation = {
-    (orig, rot) match {
-      case (XOrientation, XOrientation) => XOrientation
-      case (XOrientation, MinusXOrientation) => XOrientation
-      case (XOrientation, YOrientation) => MinusZOrientation
-      case (XOrientation, MinusYOrientation) => ZOrientation
-      case (XOrientation, ZOrientation) => MinusYOrientation
-      case (XOrientation, MinusZOrientation) => YOrientation
+  def isCubeDeranged(c: Cube): Boolean = {
+    c.orientX != XOrientation || c.orientY != YOrientation ||
+      c.orientZ != ZOrientation || c.currX != c.origX ||
+      c.currY != c.origY || c.currZ != c.origZ
+  }
 
-      case (MinusXOrientation, XOrientation) => MinusXOrientation
-      case (MinusXOrientation, MinusXOrientation) => MinusXOrientation
-      case (MinusXOrientation, YOrientation) => ZOrientation
-      case (MinusXOrientation, MinusYOrientation) => MinusZOrientation
-      case (MinusXOrientation, ZOrientation) => YOrientation
-      case (MinusXOrientation, MinusZOrientation) => MinusYOrientation
-
-      case (YOrientation, XOrientation) => MinusZOrientation
-      case (YOrientation, MinusXOrientation) => XOrientation
-      case (YOrientation, YOrientation) => YOrientation
-      case (YOrientation, MinusYOrientation) => YOrientation
-      case (YOrientation, ZOrientation) => XOrientation
-      case (YOrientation, MinusZOrientation) => MinusXOrientation
-
-      case (MinusYOrientation, XOrientation) => ZOrientation
-      case (MinusYOrientation, MinusXOrientation) => MinusZOrientation
-      case (MinusYOrientation, YOrientation) => MinusYOrientation
-      case (MinusYOrientation, MinusYOrientation) => MinusYOrientation
-      case (MinusYOrientation, ZOrientation) => MinusXOrientation
-      case (MinusYOrientation, MinusZOrientation) => XOrientation
-
-      case (ZOrientation, XOrientation) => YOrientation
-      case (ZOrientation, MinusXOrientation) => MinusYOrientation
-      case (ZOrientation, YOrientation) =>  XOrientation
-      case (ZOrientation, MinusYOrientation) => MinusXOrientation
-      case (ZOrientation, ZOrientation) => ZOrientation
-      case (ZOrientation, MinusZOrientation) => ZOrientation
-
-      case (MinusZOrientation, XOrientation) => MinusYOrientation
-      case (MinusZOrientation, MinusXOrientation) => YOrientation
-      case (MinusZOrientation, YOrientation) => MinusXOrientation
-      case (MinusZOrientation, MinusYOrientation) => XOrientation
-      case (MinusZOrientation, ZOrientation) => MinusZOrientation
-      case (MinusZOrientation, MinusZOrientation) => MinusZOrientation
+  def printDerangedCubes(r: RubiksCube): Unit = {
+    val n = r.n
+    val deranged = r.findDisarrangedCubes().toSet
+    val orderingzyx = new Ordering[(Int, Int, Int)](){
+      override def compare(x: (Int, Int, Int), y: (Int, Int, Int)): Int =  {
+        if (x._3 < y._3) return -1
+        if (x._3 > y._3) return 1
+        if (x._2 < y._2) return -1
+        if (x._2 > y._2) return 1
+        if (x._1 < y._1) return -1
+        if (x._1 > y._1) return 1
+        0
+      }
+    }
+    val que = mutable.ListBuffer[String]()
+    //create n^2 slices at z axis and print the pos.
+    for (i <- Range(0, n)) {
+      val listOfLocs = getSlice(3, i, n).sorted(orderingzyx)
+      listOfLocs.foreach { x =>
+        val cube = r.getCubeAtLoc(x)
+        val printDeranged = () => {
+          if (deranged.contains(cube)) s"${cube.origX}/${cube.currX}, ${cube.origY}/${cube.currY}, ${cube.origZ}/${cube.currZ} " else ".             "
+        }
+        que += (s"${x}: ${printDeranged()}" )
+      }
     }
 
+    var i = 0
+    while (i < que.size){
+      val el = que(i)
+      if (i % n == 0){
+        println()
+      }
+      if (i % (n*n) == 0){
+        println()
+      }
+      print(el)
+      i += 1
+    }
+    println()
+
   }
+
+  def getSlice(axis: Int, value: Int, n: Int) = {
+    //n^2 cubes in motion
+    getAllPos(n).filter(x => getTupleValAt(x, axis) == value)
+  }
+
 }

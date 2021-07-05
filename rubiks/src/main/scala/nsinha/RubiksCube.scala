@@ -1,8 +1,9 @@
 package nsinha
 
 import nsinha.Axis.{convertAxisToCordinate, findUniqueOne}
-import nsinha.Utilities.{fixOrientation, getTupleValAt, move}
+import nsinha.Utilities.{fixOrientation, getAllPos, getSlice, getTupleValAt, isCubeDeranged, move}
 
+import scala.Console.{GREEN, RESET}
 import scala.collection.immutable.Range
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -12,16 +13,7 @@ case class RubiksCube (n: Int) {
   private val cubes = ListBuffer[Cube]()
   private val posMap = mutable.HashMap[(Int, Int, Int), Cube]()
   private val revPosMap = mutable.HashMap[Cube, (Int, Int, Int)]()
-  private val allPos = {
-    val _allPos = ListBuffer[(Int, Int, Int)]()
-    for (x <- Range(0, n))
-      for (y <- Range(0, n))
-        for (z <- Range(0, n)) {
-          _allPos += Tuple3(x,y,z)
-        }
-
-    _allPos.toList
-  }
+  val allPos = getAllPos(n)
 
   createRubix()
 
@@ -54,15 +46,14 @@ case class RubiksCube (n: Int) {
     val to = convertAxisToCordinate(toAxis)
     val unchangedAxis = findUniqueZero(or(from, to))
     val unchangedAxisCord = getCoordOfPoint(point, unchangedAxis)
-    val posAffected = getSlice(unchangedAxis, unchangedAxisCord)
+    val posAffected = getSlice(unchangedAxis, unchangedAxisCord, n)
     doMove(posAffected, unchangedAxis, from, to)
 
 
   }
 
-  def getSlice(axis: Int, value: Int) = {
-    //n^2 cubes in motion
-    allPos.filter(x => getTupleValAt(x, axis) == value)
+  def getCubeAtLoc(pos: (Int, Int, Int)): Cube = {
+    posMap(pos)
   }
 
   /**
@@ -74,7 +65,17 @@ case class RubiksCube (n: Int) {
    */
   def doMove(slicePos: List[(Int, Int, Int)], unchangedAxis: Int, from: (Int, Int, Int), to: (Int, Int, Int)) = {
     import Axis._
-    slicePos.map(pos => posMap(pos)).foreach(cube => movePos(cube, findUniqueOne(from), findUniqueOne(to)))
+    val scratchPosMap = mutable.HashMap[(Int, Int, Int), Cube]()
+    slicePos.map(pos => posMap(pos)).foreach(cube => movePos(cube, findUniqueOne(from), findUniqueOne(to), scratchPosMap))
+    //scratchPosMap should be applied now to posMap and revPosMap
+    applyScratchPosMap(scratchPosMap)
+  }
+
+  def applyScratchPosMap(scratchPosMap: mutable.HashMap[(Int, Int, Int), Cube]) = {
+    for ((pos, cube) <- scratchPosMap) {
+      posMap(pos) = cube //replaces old one. but the previous pos of cube is not updated. This will happen subsequently
+      revPosMap(cube) = pos
+    }
   }
 
   /**
@@ -84,12 +85,18 @@ case class RubiksCube (n: Int) {
    * @param toAxis  like 1, 2, 3 or negatives
    * @param dir
    */
-  def movePos(cube: Cube, fromAxis: Int, toAxis: Int) = {
+  def movePos(cube: Cube, fromAxis: Int, toAxis: Int, scratchPosMap: mutable.HashMap[(Int, Int, Int), Cube]) = {
     val newPos = adjustCubePosAndOrientation(cube, fromAxis, toAxis)
-    setCubeToNewPosOnRubiks(cube, newPos)
+    setCubeToNewPosOnRubiks(cube, newPos, scratchPosMap)
   }
 
-
+  /**
+   *
+   * @param cube
+   * @param fromAxis positive
+   * @param toAxis positive
+   * @return
+   */
   def adjustCubePosAndOrientation(cube: Cube, fromAxis: Int, toAxis: Int): (Int, Int, Int) = {
     val oldPos = (cube.currX, cube.currY, cube.currZ)
     val newPos = (move(oldPos,1, fromAxis, toAxis, n), move(oldPos,2, fromAxis, toAxis, n),
@@ -108,35 +115,25 @@ case class RubiksCube (n: Int) {
    * This code will mark the oldPos null. At end of this its not a guarantee that global state
    * is correct as there can be two cubes at same location!!
    */
-  def setCubeToNewPosOnRubiks(cube: Cube, newPos: (Int, Int, Int)): Unit = {
+  def setCubeToNewPosOnRubiks(cube: Cube, newPos: (Int, Int, Int), scratchPosMap: mutable.HashMap[(Int, Int, Int), Cube]): Unit = {
     val oldPos = (cube.currX, cube.currY, cube.currZ)
-    posMap(newPos) = cube
-    revPosMap(cube) = newPos
-    posMap(oldPos) = null
-
+    scratchPosMap(newPos) = cube
   }
 
   /**
-   * find cubes not at correct location or orientation
-   * @return
-   */
+  * find cubes not at correct location or orientation
+  * @return
+  */
   def findDisarrangedCubes(): List[Cube] = {
     cubes.filter(isCubeDeranged(_)).toList
   }
-
-  def isCubeDeranged(c: Cube): Boolean = {
-    c.orientX != XOrientation || c.orientY != YOrientation ||
-      c.orientZ != ZOrientation || c.currX != c.origX ||
-      c.currY != c.origY || c.currZ != c.origZ
-  }
-
 
   /**
    * given deranged cube. find the min moves reqd to correct it.
    * e.g 0,0,0 is at 2,0,0 then then a min move is x-Z or x->Y.
    * based on orientation it might be x->Z
    */
-  def findFixForCube(cube: Cube, maxDepth: Int = 3, pathTillNow :ListBuffer[Moves] = new ListBuffer[Moves]()): mutable.ListBuffer[mutable.ListBuffer[Moves]]= {
+  def findFixForCube(cube: Cube, maxDepth: Int = 6, pathTillNow: ListBuffer[Moves] = new ListBuffer[Moves]()): mutable.ListBuffer[mutable.ListBuffer[Moves]]= {
     //do a dfs search, input is current path, o/p can be multiple forks.
     //one slice rotation can cover a difference o n, most can be captured by depth of 4.
     //never use same move 3 times in conhunction as its possible to do an opposite move to get same effect
@@ -162,21 +159,66 @@ case class RubiksCube (n: Int) {
 
   /**
    *
-    * @param mapOfCubeFixes
+   * @param mapOfCubeFixes
    * @return
    */
-  def findMostCommonFix(mapOfCubeFixes: Map[Cube, List[List[Moves]]]): Option[Moves] = {
+  def findMostCommonFix(mapOfCubeFixes: Map[Cube, List[List[Moves]]]): Option[(Moves, Cube)] = {
+    val mapOfCubeFixesLowestLen = getLowestCntPathsFromPaths(mapOfCubeFixes)
+    val mapOfCubeFixesLowestLenMaxed = getLowestCntPathsFromPathsMaxed(mapOfCubeFixesLowestLen)
+
     var moveUnion = MoveUnion(null)
-    mapOfCubeFixes.foreach { x =>
-      val cube = x._1
-      val listOfPathsForCube = x._2
+    mapOfCubeFixesLowestLenMaxed.foreach { x =>
       val firstMovesForThisCube = MoveUnion(x._2.map(y => y.head))
       moveUnion = MoveUnion.intersect(moveUnion, firstMovesForThisCube)
     }
     if (moveUnion.moves.isEmpty) {
       None
     } else {
-      Option(moveUnion.moves.head)
+      val pos = mapOfCubeFixesLowestLenMaxed.map(x => ((x._1.origX, x._1.origY, x._1.origZ), (x._1.currX, x._1.currY, x._1.currZ)))
+      println(s"moves.size = ${moveUnion.moves.size}: ${moveUnion.moves} ")
+      println("deranged cubes:")
+      pos.foreach(x => println(s"""${RESET}${GREEN}${x}${RESET}"""))
+      Option(moveUnion.moves.head, mapOfCubeFixesLowestLenMaxed.keySet.head)
     }
+  }
+
+  def getLowestCntPathsFromPaths(mapOfCubeFixes: Map[Cube, List[List[Moves]]]) = {
+    val cntMap = new mutable.HashMap[Cube, mutable.Set[Int]]()
+    val cntWisemap = new mutable.HashMap[(Cube, Int), ListBuffer[List[Moves]]]()
+    val mapOfCubeFixesLowestLen =  new mutable.HashMap[Cube, List[List[Moves]]]()
+
+    for (cube <- mapOfCubeFixes.keys) {
+      cntMap(cube) = new mutable.TreeSet[Int]()
+      val cubeFixPaths = mapOfCubeFixes(cube).map(x => (x.size,x)).foreach{ x =>
+        cntMap(cube) += x._1
+      }
+      cntMap(cube).foreach(x => cntWisemap((cube,x)) = ListBuffer[List[Moves]]())
+    }
+
+    //we have for every cube a map of paths faceted on its length. We only neeed to consider lowest for now
+    for (cube <- mapOfCubeFixes.keys) {
+      mapOfCubeFixesLowestLen(cube) = mapOfCubeFixes(cube).filter(_.size == cntMap(cube).head)
+    }
+
+    mapOfCubeFixesLowestLen
+  }
+
+  /**
+   * get the max len cubes as we will try to fix those before fixing lower ones
+   * @param mapOfCubeFixesLowestLen
+   * @return
+   */
+  def getLowestCntPathsFromPathsMaxed(mapOfCubeFixesLowestLen: mutable.HashMap[Cube, List[List[Moves]]]) = {
+    val mapOfCubeFixesLowestLenMaxed =  new mutable.HashMap[Cube, List[List[Moves]]]()
+    val maxLen = mapOfCubeFixesLowestLen.map(x => x._2.map(y => y.size).max).toList.max
+    mapOfCubeFixesLowestLen foreach { case (c, paths) =>
+      if (!paths.isEmpty) {
+        if (paths.head.size == maxLen) {
+          mapOfCubeFixesLowestLenMaxed(c) = paths
+        }
+      }
+    }
+
+    mapOfCubeFixesLowestLenMaxed
   }
 }
