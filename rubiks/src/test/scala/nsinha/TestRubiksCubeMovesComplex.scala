@@ -8,16 +8,15 @@ import Console.{GREEN, RED, RESET, YELLOW_B, UNDERLINED}
 
 class TestRubiksCubeMovesComplex extends AnyFunSpec {
 
-  it("findFixForCube  for three turns on X->Y, X->Y, X->Y") {
+  it("findFixForCube  for three turns on X->Y, X->Z") {
     val rubik = new RubiksCube(3)
-    rubik.makeMove(XAxis,YAxis, (0,0,0))
-    rubik.makeMove(YAxis,ZAxis, (0,0,0))
     rubik.makeMove(XAxis,YAxis, (0,0,0))
 
     var cycle = 1
     var cond = true
     while (rubik.findDisarrangedCubes().size != 0 && cond == true) {
       printDerangedCubes(rubik)
+      rubik.findDisarrangedCubes().foreach(x => println(Derangement.getDerangementCube(x)))
       println("Moves are generated for cycle = " + cycle)
       cycle += 1
       println("rubiks has deranged size=" + rubik.findDisarrangedCubes().size)

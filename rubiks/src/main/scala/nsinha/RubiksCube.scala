@@ -136,7 +136,7 @@ case class RubiksCube (n: Int) {
   def findFixForCube(cube: Cube, maxDepth: Int = 6, pathTillNow: ListBuffer[Moves] = new ListBuffer[Moves]()): mutable.ListBuffer[mutable.ListBuffer[Moves]]= {
     //do a dfs search, input is current path, o/p can be multiple forks.
     //one slice rotation can cover a difference o n, most can be captured by depth of 4.
-    //never use same move 3 times in conhunction as its possible to do an opposite move to get same effect
+    //never use same move 3 times in conjunction as its possible to do an opposite move to get same effect
     if (!isCubeDeranged(cube) || maxDepth <= 0) return ListBuffer(pathTillNow)
     val lastMoveOptional = pathTillNow.lastOption
     val allPathsFromHere = mutable.ListBuffer[mutable.ListBuffer[Moves]]()
@@ -158,6 +158,25 @@ case class RubiksCube (n: Int) {
   }
 
   /**
+   * second algo
+   * @param cube
+   * @param maxDepth
+   * @param pathTillNow
+   * @return
+   */
+  def findFixForCube2(cube: Cube, maxDepth: Int = 6, pathTillNow: ListBuffer[Moves] = new ListBuffer[Moves]()): mutable.ListBuffer[mutable.ListBuffer[Moves]]= {
+    /**this cube is dioriented
+    1. X-Y will move Z-Z, x-y and y-> -x etc are possible moves @link Moves.getAllMoves
+    2. Same plane moves for space correction requires at most two moves for space correction and atleast one move.
+    3. 2 plane moves where all x,y,z are different requires at most  3 moves for space correction around different
+        axis and atleast two moves
+    3.
+    **/
+
+    null
+  }
+
+    /**
    *
    * @param mapOfCubeFixes
    * @return
