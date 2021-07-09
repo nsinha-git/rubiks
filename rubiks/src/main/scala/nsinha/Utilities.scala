@@ -18,6 +18,17 @@ object Utilities {
     allPos.toList
   }
 
+  def move(oldPos:(Int, Int, Int), currAxis: Int, rotAxis: Orientation, n: Int): Int = {
+    rotAxis match {
+      case XOrientation => move(oldPos, currAxis, 3, 2, n)
+      case MinusXOrientation => move(oldPos, currAxis, 2, 3, n)
+      case YOrientation => move(oldPos, currAxis, 1, 3, n)
+      case MinusYOrientation => move(oldPos, currAxis, 3, 1, n)
+      case ZOrientation => move(oldPos, currAxis, 2, 1, n)
+      case MinusZOrientation => move(oldPos, currAxis, 1, 2, n)
+    }
+  }
+
   def move(oldPos: (Int, Int, Int), currAxis: Int, from: Int, to: Int, n: Int): Int = {
     /*
     3 -> 2 == 2->-3 == -3 ->-2 == -2 ->3:
