@@ -62,41 +62,28 @@ class TestRubiksCubeMovesComplex extends AnyFunSpec {
           rubik.makeMove(m._1.b, m._1.a, m._2)
         }
       }
-      //rubik.makeMove(XAxis, YAxis, (0,0,0))
       assert(rubik.findDisarrangedCubes().size == 0)
     }
   }
 
   it("findFixForCube  for three turns on X->Y, X->Z") {
     val rubik = new RubiksCube(3)
-    rubik.makeMove(XAxis,YAxis, (0,0,0))
-
-    var cycle = 1
-    var cond = true
-    while (rubik.findDisarrangedCubes().size != 0 && cond == true) {
-      printDerangedCubes(rubik)
-      rubik.findDisarrangedCubes().foreach(x => println(Derangement.getDerangementOfCube(x, 3)))
-      println("Moves are generated for cycle = " + cycle)
-      cycle += 1
-      println("rubiks has deranged size=" + rubik.findDisarrangedCubes().size)
-
-      val moves = rubik.findDisarrangedCubes().foldLeft(new mutable.HashMap[Cube, List[List[Moves]]]) { (Z, cube) =>
-        val listPaths = rubik.findFixForCube(cube).toList.map(_.toList)
-        Z(cube) = listPaths
-        Z
-      }.toMap
-
-      val nextMove = rubik.findMostCommonFix(moves)
-
-      if (nextMove.isEmpty) {
-        cond = false
-      } else {
-        assert(nextMove.nonEmpty)
-        val (concreteMove, concreteCube) = nextMove.get
-        println(s"${RESET}${RED}Move is calculated. Making a move ${concreteMove} at ${concreteCube.currX}, ${concreteCube.currY}, ${concreteCube.currZ}${RESET}")
-        rubik.makeMove(concreteMove.a, concreteMove.b, (concreteCube.currX, concreteCube.currY, concreteCube.currZ))
-      }
-    }
+    rubik.makeMove(XAxis, YAxis, (0, 0, 0))
+    rubik.makeMove(XAxis, ZAxis, (0, 0, 0))
+    rubik.makeMove(ZAxis, YAxis, (0, 0, 0))
+    rubik.makeMove(YAxis, XAxis, (0, 0, 0))
+    rubik.makeMove(XAxis, ZAxis, (0, 0, 0))
+    rubik.makeMove(YAxis, ZAxis, (0, 0, 0))
+    rubik.makeMove(ZAxis, XAxis, (0, 0, 0))
+    rubik.makeMove(XAxis, YAxis, (0, 0, 0))
+    printDerangedCubes(rubik)
+    rubik.findDisarrangedCubes().foreach({ x =>
+      val derangement = Derangement.getDerangementOfCube(x, 3)
+      val moves = Derangement.getMovesForOrientation(derangement)
+      println(x)
+      moves.foreach(println(_))
+      println()
+    })
   }
 
 
