@@ -1,6 +1,6 @@
-package nsinha
+package test.nsinha
 
-import nsinha.Utilities.{fixOrientation, getTupleValAt, move, orient}
+import test.nsinha.Utilities.{fixOrientation, getTupleValAt, move, orient}
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable

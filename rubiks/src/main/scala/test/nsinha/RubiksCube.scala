@@ -1,7 +1,7 @@
-package nsinha
+package test.nsinha
 
-import nsinha.Axis.{convertAxisToCordinate, findUniqueOne}
-import nsinha.Utilities.{fixOrientation, getAllPos, getSlice, getTupleValAt, isCubeDeranged, move}
+import test.nsinha.Axis.{convertAxisToCordinate, findUniqueOne}
+import test.nsinha.Utilities.{fixOrientation, getAllPos, getSlice, getTupleValAt, isCubeDeranged, move}
 
 import scala.Console.{GREEN, RESET}
 import scala.collection.immutable.Range
@@ -11,11 +11,25 @@ import scala.collection.mutable.ListBuffer
 
 case class RubiksCube (n: Int) {
   private val cubes = ListBuffer[Cube]()
-  private val posMap = mutable.HashMap[(Int, Int, Int), Cube]()
-  private val revPosMap = mutable.HashMap[Cube, (Int, Int, Int)]()
+  private[nsinha] val posMap = mutable.HashMap[(Int, Int, Int), Cube]()
+  private[nsinha] val revPosMap = mutable.HashMap[Cube, (Int, Int, Int)]()
   val allPos = getAllPos(n)
 
   createRubix()
+
+  //make a copy of this instance
+  def copy(): RubiksCube = {
+    val cp = RubiksCube(n)
+    for ((c, c1) <- cubes.zip(cp.cubes)) {
+      assert(c1.origX == c.origX && c1.origY == c.origY && c1.origZ == c.origZ)
+      c1.currX = c.currX
+      c1.currY = c.currY
+      c1.currZ = c.currZ
+      cp.posMap((c1.currX, c1.currY, c1.currZ)) = c1
+      cp.revPosMap(c1) = (c1.currX, c1.currY, c1.currZ)
+    }
+    cp
+  }
 
 
   //n rows and n cols and n depths  and 6 directions. n*n*n cuboids

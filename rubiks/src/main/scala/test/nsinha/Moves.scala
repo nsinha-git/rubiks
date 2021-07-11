@@ -1,4 +1,4 @@
-package nsinha
+package test.nsinha
 
 case class Moves(a: Axis, b: Axis) {
   override def toString: String = {

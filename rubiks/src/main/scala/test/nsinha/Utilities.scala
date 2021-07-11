@@ -1,8 +1,9 @@
-package nsinha
+package test.nsinha
 
 import scala.collection.immutable.Range
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 object Utilities {
 
@@ -184,5 +185,39 @@ object Utilities {
     //n^2 cubes in motion
     getAllPos(n).filter(x => getTupleValAt(x, axis) == value)
   }
+
+  def frequencyChartMoves(movesLists: List[List[List[Orientation]]]) = {
+    val frqMap = new mutable.HashMap[Orientation, Int]()
+    for (moveList <- movesLists) {
+      for (move <- moveList) {
+        if (frqMap.contains(move.head)) {
+          frqMap(move.head) = frqMap(move.head) + 1
+        } else {
+          frqMap(move.head) = 1
+        }
+      }
+    }
+    frqMap.toMap
+  }
+
+  def getRandomMove(): Moves = {
+    val rand = new Random(System.nanoTime())
+    Moves(intToOrientation(rand.nextInt(3)), intToOrientation(rand.nextInt(3)))
+  }
+
+  def getRandomCubePos(n: Int): (Int, Int, Int) = {
+    val rand = new Random(System.nanoTime())
+    (rand.nextInt(3), rand.nextInt(3), rand.nextInt(3))
+  }
+
+  def intToOrientation(i: Int): Axis = {
+    i match {
+      case 0 => XAxis
+      case 1 => YAxis
+      case 2 => ZAxis
+    }
+  }
+
+
 
 }

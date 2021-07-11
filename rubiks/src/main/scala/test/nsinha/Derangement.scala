@@ -1,6 +1,6 @@
-package nsinha
+package test.nsinha
 
-import nsinha.Utilities.move
+import test.nsinha.Utilities.move
 
 import scala.::
 import scala.collection.mutable
@@ -102,8 +102,8 @@ object Derangement {
        case (XOrientation, MinusXOrientation) => NotXOrientation
        case (XOrientation, YOrientation) => ZOrientation
        case (XOrientation, MinusYOrientation) => MinusZOrientation
-       case (XOrientation, ZOrientation) => YOrientation
-       case (XOrientation, MinusZOrientation) => MinusYOrientation
+       case (XOrientation, ZOrientation) => MinusYOrientation
+       case (XOrientation, MinusZOrientation) => YOrientation
        case (YOrientation, YOrientation) => null
        case (YOrientation, MinusYOrientation) => NotYOrientation
        case (YOrientation, XOrientation) => MinusZOrientation
@@ -112,8 +112,8 @@ object Derangement {
        case (YOrientation, MinusZOrientation) => XOrientation
        case (ZOrientation, ZOrientation) => null
        case (ZOrientation, MinusZOrientation) => NotZOrientation
-       case (ZOrientation, XOrientation) => MinusYOrientation
-       case (ZOrientation, MinusXOrientation) => YOrientation
+       case (ZOrientation, XOrientation) => YOrientation
+       case (ZOrientation, MinusXOrientation) => MinusYOrientation
        case (ZOrientation, YOrientation) => XOrientation
        case (ZOrientation, MinusYOrientation) => MinusXOrientation
      }

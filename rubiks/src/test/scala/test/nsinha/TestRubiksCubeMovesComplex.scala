@@ -1,6 +1,6 @@
-package nsinha
+package test.nsinha
 
-import nsinha.Utilities.printDerangedCubes
+import test.nsinha.Utilities.{frequencyChartMoves, getRandomCubePos, getRandomMove, printDerangedCubes}
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable
@@ -26,21 +26,6 @@ class TestRubiksCubeMovesComplex extends AnyFunSpec {
     assert (rubik.findDisarrangedCubes().size == 0)
   }
 
-  def getRandomMove(): Moves = {
-   Moves(intToOrientation(rand.nextInt(3)), intToOrientation(rand.nextInt(3)))
-  }
-
-  def getRandomCubePos(n: Int): (Int, Int, Int) = {
-    (rand.nextInt(3), rand.nextInt(3), rand.nextInt(3))
-  }
-
-  def intToOrientation(i: Int): Axis = {
-    i match {
-      case 0 => XAxis
-      case 1 => YAxis
-      case 2 => ZAxis
-    }
-  }
 
   it ("check moves in random seq and reverse makes the rubiks ok 2") {
     for (i <- Range(0, 10)) {
@@ -68,14 +53,7 @@ class TestRubiksCubeMovesComplex extends AnyFunSpec {
 
   it("findFixForCube  for three turns on X->Y, X->Z") {
     val rubik = new RubiksCube(3)
-    rubik.makeMove(XAxis, YAxis, (0, 0, 0))
-    rubik.makeMove(XAxis, ZAxis, (0, 0, 0))
-    rubik.makeMove(ZAxis, YAxis, (0, 0, 0))
     rubik.makeMove(YAxis, XAxis, (0, 0, 0))
-    rubik.makeMove(XAxis, ZAxis, (0, 0, 0))
-    rubik.makeMove(YAxis, ZAxis, (0, 0, 0))
-    rubik.makeMove(ZAxis, XAxis, (0, 0, 0))
-    rubik.makeMove(XAxis, YAxis, (0, 0, 0))
     printDerangedCubes(rubik)
     rubik.findDisarrangedCubes().foreach({ x =>
       val derangement = Derangement.getDerangementOfCube(x, 3)
@@ -84,6 +62,22 @@ class TestRubiksCubeMovesComplex extends AnyFunSpec {
       moves.foreach(println(_))
       println()
     })
+    rubik.makeMove(XAxis, ZAxis, (0, 1, 0))
+    printDerangedCubes(rubik)
+    val moves = rubik.findDisarrangedCubes().map({ x =>
+      val derangement = Derangement.getDerangementOfCube(x, 3)
+      val moves = Derangement.getMovesForOrientation(derangement)
+      println(x)
+      moves.foreach(println(_))
+      println()
+      moves
+    })
+
+    val freqMapMoves = frequencyChartMoves(moves)
+    println(freqMapMoves)
+
+    rubik.makeMove(XAxis, ZAxis, (0, 1, 0))
+
   }
 
 
