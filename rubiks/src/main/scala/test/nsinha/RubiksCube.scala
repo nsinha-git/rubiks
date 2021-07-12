@@ -25,6 +25,9 @@ case class RubiksCube (n: Int) {
       c1.currX = c.currX
       c1.currY = c.currY
       c1.currZ = c.currZ
+      c1.orientX = c.orientX
+      c1.orientY = c.orientY
+      c1.orientZ = c.orientZ
       cp.posMap((c1.currX, c1.currY, c1.currZ)) = c1
       cp.revPosMap(c1) = (c1.currX, c1.currY, c1.currZ)
     }

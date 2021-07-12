@@ -2,7 +2,9 @@ package test.nsinha
 
 
 import test.nsinha.Utilities.{frequencyChartMoves, printDerangedCubes}
-import org.scalatest.funspec.AnyFunSpec;
+import org.scalatest.funspec.AnyFunSpec
+
+import scala.Console.{BLUE, CYAN, MAGENTA, RESET, YELLOW};
 
 class TestMoveSetOne extends AnyFunSpec {
   it("findFixForCube  for three turns on Y->X, X->Z") {
@@ -30,9 +32,21 @@ class TestMoveSetOne extends AnyFunSpec {
     val freqMapMoves = frequencyChartMoves(moves)
     println(freqMapMoves)
 
-    rubik.makeMove(XAxis, ZAxis, (0, 1, 0))
+    val rubik1 = rubik.copy()
+    val rubik2 = rubik.copy()
+    println(s"${RESET}${MAGENTA}")
+    printDerangedCubes(rubik)
+    println(s"${RESET}${BLUE}")
+    printDerangedCubes(rubik1)
+    println(s"${RESET}${CYAN}")
+    printDerangedCubes(rubik2)
+
 
   }
+
+
+
+
 
 
 
