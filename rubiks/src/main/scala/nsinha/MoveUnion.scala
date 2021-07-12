@@ -1,4 +1,4 @@
-package test.nsinha
+package nsinha
 
 case class MoveUnion(moves: List[Moves]) {
 }

@@ -1,4 +1,4 @@
-package test.nsinha
+package nsinha
 
 sealed trait Orientation
 object XOrientation extends Orientation

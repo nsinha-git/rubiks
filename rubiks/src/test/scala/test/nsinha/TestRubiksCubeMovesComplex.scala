@@ -1,6 +1,7 @@
 package test.nsinha
 
-import test.nsinha.Utilities.{frequencyChartMoves, getRandomCubePos, getRandomMove, printDerangedCubes}
+import nsinha.{Moves, RubiksCube, XAxis, YAxis, ZAxis}
+import nsinha.Utilities.{frequencyChartMoves, getRandomCubePos, getRandomMove, printDerangedCubes}
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable

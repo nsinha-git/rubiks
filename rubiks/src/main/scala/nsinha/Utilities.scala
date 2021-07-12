@@ -1,4 +1,4 @@
-package test.nsinha
+package nsinha
 
 import scala.collection.immutable.Range
 import scala.collection.mutable
@@ -19,14 +19,14 @@ object Utilities {
     allPos.toList
   }
 
-  def move(oldPos:(Int, Int, Int), currAxis: Int, rotAxis: Orientation, n: Int): Int = {
+  def move(oldPos: (Int, Int, Int), currAxis: Int, rotAxis: Orientation, n: Int): Int = {
     rotAxis match {
-      case XOrientation => move(oldPos, currAxis, 3, 2, n)
-      case MinusXOrientation => move(oldPos, currAxis, 2, 3, n)
-      case YOrientation => move(oldPos, currAxis, 1, 3, n)
-      case MinusYOrientation => move(oldPos, currAxis, 3, 1, n)
-      case ZOrientation => move(oldPos, currAxis, 2, 1, n)
-      case MinusZOrientation => move(oldPos, currAxis, 1, 2, n)
+      case XOrientation => move(oldPos, currAxis, 2, 3, n)
+      case MinusXOrientation => move(oldPos, currAxis, 3, 2, n)
+      case YOrientation => move(oldPos, currAxis, 3, 1, n)
+      case MinusYOrientation => move(oldPos, currAxis, 1, 3, n)
+      case ZOrientation => move(oldPos, currAxis, 1, 2, n)
+      case MinusZOrientation => move(oldPos, currAxis, 2, 1, n)
     }
   }
 
@@ -41,7 +41,7 @@ object Utilities {
       if (from == currAxis) {
         if (to > 0) {
           //-to moves to from
-          n -1 - getTupleValAt(oldPos, to)
+          n - 1 - getTupleValAt(oldPos, to)
         } else {
           //to < 0 so abs(to) moves to from
           getTupleValAt(oldPos, to)
@@ -53,7 +53,7 @@ object Utilities {
           getTupleValAt(oldPos, from)
         } else {
           //-from moves to to
-          n -1 - getTupleValAt(oldPos, from)
+          n - 1 - getTupleValAt(oldPos, from)
         }
       }
     } else {
@@ -81,7 +81,7 @@ object Utilities {
   def orient(orig: Orientation, from: Int, to: Int): Orientation = {
     if (from == to) return orig
     (from, to) match {
-      case (1,2) => orig match {
+      case (1, 2) => orig match {
         case XOrientation => YOrientation
         case YOrientation => MinusXOrientation
         case ZOrientation => ZOrientation
@@ -89,7 +89,7 @@ object Utilities {
         case MinusYOrientation => XOrientation
         case MinusZOrientation => MinusZOrientation
       }
-      case (1,3) => orig match {
+      case (1, 3) => orig match {
         case XOrientation => ZOrientation
         case YOrientation => YOrientation
         case ZOrientation => MinusXOrientation
@@ -97,7 +97,7 @@ object Utilities {
         case MinusYOrientation => MinusYOrientation
         case MinusZOrientation => XOrientation
       }
-      case (2,1) => orig match {
+      case (2, 1) => orig match {
         case XOrientation => MinusYOrientation
         case YOrientation => XOrientation
         case ZOrientation => ZOrientation
@@ -105,7 +105,7 @@ object Utilities {
         case MinusYOrientation => MinusXOrientation
         case MinusZOrientation => MinusZOrientation
       }
-      case (2,3) => orig match {
+      case (2, 3) => orig match {
         case XOrientation => XOrientation
         case YOrientation => ZOrientation
         case ZOrientation => MinusYOrientation
@@ -113,7 +113,7 @@ object Utilities {
         case MinusYOrientation => MinusZOrientation
         case MinusZOrientation => YOrientation
       }
-      case (3,1) => orig match {
+      case (3, 1) => orig match {
         case XOrientation => MinusZOrientation
         case YOrientation => YOrientation
         case ZOrientation => XOrientation
@@ -121,7 +121,7 @@ object Utilities {
         case MinusYOrientation => MinusYOrientation
         case MinusZOrientation => MinusXOrientation
       }
-      case (3,2) => orig match {
+      case (3, 2) => orig match {
         case XOrientation => XOrientation
         case YOrientation => MinusZOrientation
         case ZOrientation => YOrientation
@@ -141,8 +141,8 @@ object Utilities {
   def printDerangedCubes(r: RubiksCube): Unit = {
     val n = r.n
     val deranged = r.findDisarrangedCubes().toSet
-    val orderingzyx = new Ordering[(Int, Int, Int)](){
-      override def compare(x: (Int, Int, Int), y: (Int, Int, Int)): Int =  {
+    val orderingzyx = new Ordering[(Int, Int, Int)]() {
+      override def compare(x: (Int, Int, Int), y: (Int, Int, Int)): Int = {
         if (x._3 < y._3) return -1
         if (x._3 > y._3) return 1
         if (x._2 < y._2) return -1
@@ -161,17 +161,17 @@ object Utilities {
         val printDeranged = () => {
           if (deranged.contains(cube)) s"${cube.origX}/${cube.currX}, ${cube.origY}/${cube.currY}, ${cube.origZ}/${cube.currZ} " else ".             "
         }
-        que += (s"${x}: ${printDeranged()}" )
+        que += (s"${x}: ${printDeranged()}")
       }
     }
 
     var i = 0
-    while (i < que.size){
+    while (i < que.size) {
       val el = que(i)
-      if (i % n == 0){
+      if (i % n == 0) {
         println()
       }
-      if (i % (n*n) == 0){
+      if (i % (n * n) == 0) {
         println()
       }
       print(el)
@@ -217,7 +217,6 @@ object Utilities {
       case 2 => ZAxis
     }
   }
-
 
 
 }

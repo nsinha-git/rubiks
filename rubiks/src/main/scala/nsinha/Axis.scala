@@ -1,4 +1,4 @@
-package test.nsinha
+package nsinha
 
 sealed trait Axis
 object XAxis extends Axis {

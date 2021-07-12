@@ -1,8 +1,7 @@
-package test.nsinha
+package nsinha
 
-import test.nsinha.Utilities.move
+import Utilities.move
 
-import scala.::
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.math.abs
@@ -12,7 +11,7 @@ case class Derangement(xOrient: Orientation, yOrient: Orientation, zOrient: Orie
 
 object Derangement {
   def getDerangementOfCube(c: Cube, n: Int): Derangement = {
-    Derangement(c.orientX, c.orientY, c.orientZ, (c.origX, c.currX), (c.origY, c.currY), (c.origZ, c.currZ), n)
+    nsinha.Derangement(c.orientX, c.orientY, c.orientZ, (c.origX, c.currX), (c.origY, c.currY), (c.origZ, c.currZ), n)
   }
 
   def getMovesForOrientation(derangement: Derangement) = {
@@ -100,14 +99,14 @@ object Derangement {
      val res = (a, b) match {
        case (XOrientation, XOrientation) => null
        case (XOrientation, MinusXOrientation) => NotXOrientation
-       case (XOrientation, YOrientation) => ZOrientation
-       case (XOrientation, MinusYOrientation) => MinusZOrientation
+       case (XOrientation, YOrientation) => MinusZOrientation
+       case (XOrientation, MinusYOrientation) => ZOrientation
        case (XOrientation, ZOrientation) => YOrientation
        case (XOrientation, MinusZOrientation) => MinusYOrientation
        case (YOrientation, YOrientation) => null
        case (YOrientation, MinusYOrientation) => NotYOrientation
-       case (YOrientation, XOrientation) => MinusZOrientation
-       case (YOrientation, MinusXOrientation) => ZOrientation
+       case (YOrientation, XOrientation) => ZOrientation
+       case (YOrientation, MinusXOrientation) => MinusZOrientation
        case (YOrientation, ZOrientation) => MinusXOrientation
        case (YOrientation, MinusZOrientation) => XOrientation
        case (ZOrientation, ZOrientation) => null
