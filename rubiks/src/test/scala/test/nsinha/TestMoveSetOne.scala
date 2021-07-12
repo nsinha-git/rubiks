@@ -1,7 +1,7 @@
 package test.nsinha
 
 
-import nsinha.{RubiksCube, XAxis, YAxis, ZAxis}
+import nsinha.{Derangement, RubiksCube, XAxis, YAxis, ZAxis}
 import nsinha.Utilities.{frequencyChartMoves, printDerangedCubes}
 import org.scalatest.funspec.AnyFunSpec
 
