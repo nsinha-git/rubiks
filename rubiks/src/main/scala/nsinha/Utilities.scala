@@ -18,16 +18,28 @@ object Utilities {
 
     allPos.toList
   }
+  def mapToAxes(i:  Int) = {
+    i match {
+      case 1 => XAxis
+      case 2 => YAxis
+      case 3 => ZAxis
+    }
+  }
+
+  def getAxisFromTo(rotAxis: Orientation): (Int, Int) = {
+    rotAxis match {
+      case XOrientation => (2, 3)
+      case MinusXOrientation => (3, 2)
+      case YOrientation => (3, 1)
+      case MinusYOrientation => (1, 3)
+      case ZOrientation => (1, 2)
+      case MinusZOrientation => (2, 1)
+    }
+  }
 
   def move(oldPos: (Int, Int, Int), currAxis: Int, rotAxis: Orientation, n: Int): Int = {
-    rotAxis match {
-      case XOrientation => move(oldPos, currAxis, 2, 3, n)
-      case MinusXOrientation => move(oldPos, currAxis, 3, 2, n)
-      case YOrientation => move(oldPos, currAxis, 3, 1, n)
-      case MinusYOrientation => move(oldPos, currAxis, 1, 3, n)
-      case ZOrientation => move(oldPos, currAxis, 1, 2, n)
-      case MinusZOrientation => move(oldPos, currAxis, 2, 1, n)
-    }
+    val axesFromTo = getAxisFromTo(rotAxis)
+    move(oldPos, currAxis, axesFromTo._1, axesFromTo._2, n)
   }
 
   def move(oldPos: (Int, Int, Int), currAxis: Int, from: Int, to: Int, n: Int): Int = {
@@ -217,6 +229,16 @@ object Utilities {
       case 2 => ZAxis
     }
   }
+
+  def getTopFrequenciesMove(cubeMovs: Map[Cube, List[List[Orientation]]], freqMap: Map[Orientation, Int]): List[(Cube, Orientation)] = {
+    val maxFreq = freqMap.values.max
+    val orientationsToConsider = freqMap.toList.filter{case (x,y) => y == maxFreq} map (_._1)
+
+    orientationsToConsider map { or =>
+      cubeMovs.find {case (c,l) => l.map(x => x.head).toSet.contains(or)}.get._1 -> or
+    }
+  }
+
 
 
 }
