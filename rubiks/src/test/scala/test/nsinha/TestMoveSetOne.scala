@@ -31,17 +31,6 @@ class TestMoveSetOne extends AnyFunSpec {
 
     val freqMapMoves = frequencyChartMoves(moves)
     println(freqMapMoves)
-
-    val rubik1 = rubik.copy()
-    val rubik2 = rubik.copy()
-    println(s"${RESET}${MAGENTA}")
-    printDerangedCubes(rubik)
-    println(s"${RESET}${BLUE}")
-    printDerangedCubes(rubik1)
-    println(s"${RESET}${CYAN}")
-    printDerangedCubes(rubik2)
-
-
   }
 
 
