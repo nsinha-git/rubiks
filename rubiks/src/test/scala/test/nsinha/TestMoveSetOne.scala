@@ -12,7 +12,7 @@ class TestMoveSetOne extends AnyFunSpec {
     val rubik = new RubiksCube(3)
     rubik.makeMove(YAxis, XAxis, (0, 0, 0)) //minusZ
     rubik.makeMove(XAxis, ZAxis, (0, 1, 0)) //minusY
-    val ev = Evaluation.evaluate(rubik, 20, List.empty)
+    val ev = Evaluation.evaluate(rubik, 5, List.empty)
     assert(ev._1)
     println(s"${CYAN}")
     println(ev._3)

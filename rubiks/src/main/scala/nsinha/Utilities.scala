@@ -214,20 +214,12 @@ object Utilities {
 
   def getRandomMove(): Moves = {
     val rand = new Random(System.nanoTime())
-    Moves(intToOrientation(rand.nextInt(3)), intToOrientation(rand.nextInt(3)))
+    Moves(mapToAxes(rand.nextInt(3)), mapToAxes(rand.nextInt(3)))
   }
 
   def getRandomCubePos(n: Int): (Int, Int, Int) = {
     val rand = new Random(System.nanoTime())
     (rand.nextInt(3), rand.nextInt(3), rand.nextInt(3))
-  }
-
-  def intToOrientation(i: Int): Axis = {
-    i match {
-      case 0 => XAxis
-      case 1 => YAxis
-      case 2 => ZAxis
-    }
   }
 
   def getTopFrequenciesMove(cubeMovs: Map[Cube, List[List[Orientation]]], freqMap: Map[Orientation, Int]): List[(Cube, Orientation)] = {

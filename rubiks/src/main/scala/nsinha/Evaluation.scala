@@ -6,7 +6,7 @@ import scala.+:
 
 object Evaluation {
 
-  def evaluate(rubik: RubiksCube, d: Int = 20, path: List[(Cube, Orientation)]): (Boolean, Map[Orientation, Int], List[(Cube, Orientation)]) = {
+  def evaluate(rubik: RubiksCube, d: Int, path: List[(Cube, Orientation)]): (Boolean, Map[Orientation, Int], List[(Cube, Orientation)]) = {
     val cubeMoves = rubik.findDisarrangedCubes().map({ x =>
       val derangement = Derangement.getDerangementOfCube(x, 3)
       val moves = Derangement.getMovesForOrientation(derangement)
