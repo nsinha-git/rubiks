@@ -3,6 +3,7 @@ package nsinha
 import nsinha.Utilities.{frequencyChartMoves, getAxisFromTo, getTopFrequenciesMove, mapToAxes}
 
 import scala.+:
+import scala.Console.{GREEN, RED, RESET}
 
 object Evaluation {
 
@@ -18,7 +19,13 @@ object Evaluation {
 
     val freqMapMoves = frequencyChartMoves(cubeMoves.values.toList)
     println(freqMapMoves)
-    if (freqMapMoves.isEmpty || d == 0) return (freqMapMoves.isEmpty, freqMapMoves, path)
+    if (freqMapMoves.isEmpty) {
+      println(s"${RESET}${GREEN}A move has been found  ${path} ${RESET}")
+      return (freqMapMoves.isEmpty, freqMapMoves, path)
+    }
+    if (d == 0) {
+      return (freqMapMoves.isEmpty, freqMapMoves, path)
+    }
 
     val topMoves = getTopFrequenciesMove(cubeMoves, freqMapMoves)
     val fork = topMoves.size > 1
@@ -29,7 +36,7 @@ object Evaluation {
         val from = mapToAxes(axesFromTo._1)
         val to = mapToAxes(axesFromTo._2)
         cpRubik.makeMove(from, to, (c.currX, c.currY, c.currZ))
-        if (d > 3) evaluate(cpRubik, 3, List.empty) else evaluate(cpRubik, d - 1, List.empty)
+        if (d > 3) evaluate(cpRubik, 3, path :+ (c,t)) else evaluate(cpRubik, d - 1, path :+ (c,t))
       }
 
 
@@ -39,7 +46,9 @@ object Evaluation {
     } else {
       topMoves(0)
     }
-    val newPath = path.:+(c, t)
+    val newPath = path :+ (c, t)
+    println(s"${RESET}${RED}new move ${c}:${t}${RESET}")
+    println(s"${RESET}${RED}newPath: ${newPath}${RESET}")
     val cpRubik = rubik.copy()
     val axesFromTo = getAxisFromTo(t)
     val from = mapToAxes(axesFromTo._1)

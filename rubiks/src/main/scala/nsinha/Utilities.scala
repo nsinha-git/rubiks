@@ -207,6 +207,14 @@ object Utilities {
         } else {
           frqMap(move.head) = 1
         }
+        if (move.size > 100) {
+          val secondElem = move(2)
+          if (frqMap.contains(secondElem)) {
+            frqMap(secondElem) = frqMap(secondElem) + 2
+          } else {
+            frqMap(secondElem) = 2
+          }
+        }
       }
     }
     frqMap.toMap
