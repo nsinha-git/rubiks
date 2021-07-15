@@ -3,7 +3,7 @@ package nsinha
 import nsinha.Utilities.{frequencyChartMoves, getAxisFromTo, getTopFrequenciesMove, mapToAxes}
 
 import scala.+:
-import scala.Console.{GREEN, RED, RESET}
+import scala.Console.{GREEN, RED, RESET, BLUE}
 
 object Evaluation {
 
@@ -28,8 +28,10 @@ object Evaluation {
     }
 
     val topMoves = getTopFrequenciesMove(cubeMoves, freqMapMoves)
+    println(s"${RESET}${BLUE}path: $path fork size:${topMoves.size}${RESET}")
     val fork = topMoves.size > 1
     val (c,t) = if (fork) {
+      println(s"${RESET}${BLUE}fork started $path ${RESET}")
       val partialResultsDfs = topMoves.map { case (c, t) =>
         val cpRubik = rubik.copy()
         val axesFromTo = getAxisFromTo(t)
@@ -38,8 +40,7 @@ object Evaluation {
         cpRubik.makeMove(from, to, (c.currX, c.currY, c.currZ))
         if (d > 3) evaluate(cpRubik, 3, path :+ (c,t)) else evaluate(cpRubik, d - 1, path :+ (c,t))
       }
-
-
+      println(s"${RESET}${BLUE}fork ended${RESET}")
       val min = partialResultsDfs.map { case (r, freqs, path) => evaluateMapOfFreq(freqs) }.min
       val idx = partialResultsDfs.zipWithIndex.find { case r => evaluateMapOfFreq(r._1._2) == min }.get._2
       topMoves(idx)
