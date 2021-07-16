@@ -232,7 +232,8 @@ object Utilities {
 
   def getTopFrequenciesMove(cubeMovs: Map[Cube, List[List[Orientation]]], freqMap: Map[Orientation, Int]): List[(Cube, Orientation)] = {
     val maxFreq = freqMap.values.max
-    val orientationsToConsider = freqMap.toList.filter{case (x,y) => y == maxFreq} map (_._1)
+    val limit = math.max(maxFreq/2 + 1, maxFreq - 2 )
+    val orientationsToConsider = freqMap.toList.filter{case (x,y) => y > limit} map (_._1)
 
     orientationsToConsider map { or =>
       cubeMovs.find {case (c,l) => l.map(x => x.head).toSet.contains(or)}.get._1 -> or

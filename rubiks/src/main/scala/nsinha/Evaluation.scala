@@ -3,7 +3,7 @@ package nsinha
 import nsinha.Utilities.{frequencyChartMoves, getAxisFromTo, getTopFrequenciesMove, mapToAxes}
 
 import scala.+:
-import scala.Console.{GREEN, RED, RESET, BLUE}
+import scala.Console.{BLUE, GREEN, RED, RESET, YELLOW}
 
 object Evaluation {
 
@@ -38,6 +38,7 @@ object Evaluation {
         val from = mapToAxes(axesFromTo._1)
         val to = mapToAxes(axesFromTo._2)
         cpRubik.makeMove(from, to, (c.currX, c.currY, c.currZ))
+        println(s"${RESET}${YELLOW}partial results evaluation: ${path :+ (c,t)}${RESET}")
         if (d > 3) evaluate(cpRubik, 3, path :+ (c,t)) else evaluate(cpRubik, d - 1, path :+ (c,t))
       }
       println(s"${RESET}${BLUE}fork ended${RESET}")

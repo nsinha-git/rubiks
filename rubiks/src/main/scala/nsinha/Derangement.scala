@@ -26,14 +26,18 @@ object Derangement {
       //will it correct the pos. if yes keep it. else throw it
       val actualPos =  (derangement.xPos._1, derangement.yPos._1,  derangement.zPos._1)
       val pos =  (derangement.xPos._2, derangement.yPos._2,  derangement.zPos._2)
-      var posNew = (-1, -1, -1)
-      for (rot <- movesSeq) {
-        posNew = (move(pos,1, rot, n), move(pos,2, rot, n),
-          move(pos,3, rot, n))
+      if (pos != actualPos) {
+        var posNew = (-1, -1, -1)
+        for (rot <- movesSeq) {
+          posNew = (move(pos, 1, rot, n), move(pos, 2, rot, n),
+            move(pos, 3, rot, n))
+        }
+        if (positionDegrade(posNew, pos, actualPos) <= 0) {
+          combs += movesSeq
+        }
+      } else { //pos and actaulPos are same. They differ only in orientation.
+        combs += movesSeq
       }
-       if (positionDegrade(posNew, pos, actualPos) <= 0 ) {
-         combs += movesSeq
-       }
     }
     combs.toList
   }
