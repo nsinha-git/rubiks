@@ -262,4 +262,32 @@ case class RubiksCube(n: Int) {
 
     mapOfCubeFixesLowestLenMaxed
   }
+
+
+
+  def ressetCube(movedCubes: List[MovedCube]) = {
+     val t = movedCubes map { x =>
+      val c = posMap(x.origPos)
+      c.currX = x.newX
+      c.currY = x.newY
+      c.currZ = x.newZ
+      c.orientX = x.orientX
+      c.orientY = x.orientY
+      c.orientZ = x.orientZ
+       () => {
+         posMap(x.newPos) = c
+         revPosMap(c) = x.newPos
+       }
+
+    }
+    t.foreach(_())
+  }
+}
+
+
+case class MovedCube(origX: Int, origY: Int, origZ: Int, newX: Int, newY: Int, newZ: Int,
+                     orientX: Orientation, orientY: Orientation, orientZ: Orientation) {
+  def origPos = (origX, origY, origZ)
+  def newPos = (newX, newY, newZ)
+  def newOrientation = (orientX, orientY, orientZ)
 }

@@ -1,7 +1,7 @@
-package test.nsinha
+package test.nsinha.threebythree
 
-import nsinha.{Cube, MinusXOrientation, MinusZOrientation, Moves, RubiksCube, XAxis, XOrientation, YAxis, YOrientation, ZAxis, ZOrientation}
 import nsinha.Utilities.{fixOrientation, getTupleValAt, move, orient}
+import nsinha._
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable

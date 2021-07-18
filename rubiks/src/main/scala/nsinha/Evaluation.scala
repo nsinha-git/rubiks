@@ -1,6 +1,6 @@
 package nsinha
 
-import nsinha.Utilities.{frequencyChartMoves, getAxisFromTo, getTopFrequenciesMove, mapToAxes}
+import nsinha.Utilities.{frequencyChartMoves, getAxisFromTo, getFreqDistMoves, getTopFrequenciesMove, mapToAxes}
 
 import scala.+:
 import scala.Console.{BLUE, GREEN, RED, RESET, YELLOW}
@@ -8,17 +8,9 @@ import scala.Console.{BLUE, GREEN, RED, RESET, YELLOW}
 object Evaluation {
 
   def evaluate(rubik: RubiksCube, d: Int, path: List[(Cube, Orientation)]): (Boolean, Map[Orientation, Int], List[(Cube, Orientation)]) = {
-    val cubeMoves = rubik.findDisarrangedCubes().map({ x =>
-      val derangement = Derangement.getDerangementOfCube(x, 3)
-      val moves = Derangement.getMovesForOrientation(derangement)
-      println(x)
-      moves.foreach(println(_))
-      println()
-      x -> moves
-    }).toMap
-
-    val freqMapMoves = frequencyChartMoves(cubeMoves.values.toList)
+    val (cubeMoves, freqMapMoves) = getFreqDistMoves(rubik)
     println(freqMapMoves)
+
     if (freqMapMoves.isEmpty) {
       println(s"${RESET}${GREEN}A move has been found  ${path} ${RESET}")
       return (freqMapMoves.isEmpty, freqMapMoves, path)
@@ -39,7 +31,9 @@ object Evaluation {
         val to = mapToAxes(axesFromTo._2)
         cpRubik.makeMove(from, to, (c.currX, c.currY, c.currZ))
         println(s"${RESET}${YELLOW}partial results evaluation: ${path :+ (c,t)}${RESET}")
-        if (d > 3) evaluate(cpRubik, 3, path :+ (c,t)) else evaluate(cpRubik, d - 1, path :+ (c,t))
+        val res = if (d > 3) evaluate(cpRubik, 3, path :+ (c,t)) else evaluate(cpRubik, d - 1, path :+ (c,t))
+        println(s"${RESET}${YELLOW}partial results evaluation done: ${res}${RESET}")
+        res
       }
       println(s"${RESET}${BLUE}fork ended${RESET}")
       val min = partialResultsDfs.map { case (r, freqs, path) => evaluateMapOfFreq(freqs) }.min

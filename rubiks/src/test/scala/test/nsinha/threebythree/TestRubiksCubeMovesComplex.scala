@@ -1,11 +1,9 @@
-package test.nsinha
+package test.nsinha.threebythree
 
-import nsinha.{Derangement, Moves, RubiksCube, XAxis, YAxis, ZAxis}
 import nsinha.Utilities.{frequencyChartMoves, getRandomCubePos, getRandomMove, printDerangedCubes}
+import nsinha._
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.collection.mutable
-import Console.{GREEN, RED, RESET, UNDERLINED, YELLOW_B}
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
