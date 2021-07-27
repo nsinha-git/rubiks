@@ -158,13 +158,15 @@ object Utilities {
     val n = r.n
     val deranged = r.findDisarrangedCubes().toSet
     val orderingzyx = new Ordering[(Int, Int, Int)]() {
-      override def compare(x: (Int, Int, Int), y: (Int, Int, Int)): Int = {
-        if (x._3 < y._3) return -1
-        if (x._3 > y._3) return 1
-        if (x._2 < y._2) return -1
-        if (x._2 > y._2) return 1
-        if (x._1 < y._1) return -1
-        if (x._1 > y._1) return 1
+      override def compare(a: (Int, Int, Int), b: (Int, Int, Int)): Int = {
+        if (a._1 < b._1) return -1
+        if (a._2 < b._2) return -1
+        if (a._3 < b._3) return -1
+        if (a._1 > b._1) return 1
+        if (a._2 > b._2) return 1
+        if (a._3 > b._3) return 1
+
+
         0
       }
     }
@@ -197,9 +199,9 @@ object Utilities {
 
   }
 
-  def getSlice(axis: Int, value: Int, n: Int) = {
+  def getSlice(axis: Int, idxAxis: Int, n: Int) = {
     //n^2 cubes in motion
-    getAllPos(n).filter(x => getTupleValAt(x, axis) == value)
+    getAllPos(n).filter(x => getTupleValAt(x, axis) == idxAxis)
   }
 
   def frequencyChartMoves(movesLists: List[List[List[Orientation]]]) = {
