@@ -12,6 +12,7 @@ case class RubiksCube(n: Int) {
   private val cubes = ListBuffer[Cube]()
   private[nsinha] val posMap = mutable.HashMap[(Int, Int, Int), Cube]()
   private[nsinha] val revPosMap = mutable.HashMap[Cube, (Int, Int, Int)]()
+  private [nsinha] val numMoves = mutable.HashMap[(Int, Int, Int), Int]()
   val allPos = getAllPos(n)
 
   createRubix()
@@ -49,6 +50,14 @@ case class RubiksCube(n: Int) {
         }
   }
 
+  def getMovesMap() = {
+    numMoves.toMap
+  }
+
+  def resetMovesMap() = {
+    numMoves.clear()
+  }
+
   /**
    * given a point in (x,y,z) and the fromAxis toAxis, make a move of a slice.
    *
@@ -65,8 +74,6 @@ case class RubiksCube(n: Int) {
     val unchangedAxisCord = getCoordOfPoint(point, unchangedAxis)
     val posAffected = getSlice(unchangedAxis, unchangedAxisCord, n)
     doMove(posAffected, unchangedAxis, from, to)
-
-
   }
 
   def getCubeAtLoc(pos: (Int, Int, Int)): Cube = {
@@ -137,6 +144,15 @@ case class RubiksCube(n: Int) {
   def setCubeToNewPosOnRubiks(cube: Cube, newPos: (Int, Int, Int), scratchPosMap: mutable.HashMap[(Int, Int, Int), Cube]): Unit = {
     val oldPos = (cube.currX, cube.currY, cube.currZ)
     scratchPosMap(newPos) = cube
+    if (numMoves.contains(getLoc(cube))) {
+      numMoves(getLoc(cube)) += 1
+    } else {
+      numMoves(getLoc(cube)) = 1
+    }
+  }
+
+  def getLoc(cube: Cube) = {
+    (cube.origX, cube.origY, cube.origZ)
   }
 
   /**
@@ -149,11 +165,20 @@ case class RubiksCube(n: Int) {
   }
 
   /**
+   * find cubes not at correct location or orientation
+   *
+   * @return
+   */
+  def findDisarrangedByPosCubes(): List[Cube] = {
+    cubes.filter(isCubeDislocated(_)).toList
+  }
+
+  /**
    * given deranged cube. find the min moves reqd to correct it.
    * e.g 0,0,0 is at 2,0,0 then then a min move is x-Z or x->Y.
    * based on orientation it might be x->Z
    */
-  def findFixForCube(cube: Cube, maxDepth: Int = 6, pathTillNow: ListBuffer[Moves] = new ListBuffer[Moves]()): mutable.ListBuffer[mutable.ListBuffer[Moves]] = {
+  def findFixForCube(cube: Cube, maxDepth: Int, pathTillNow: ListBuffer[Moves] = new ListBuffer[Moves]()): mutable.ListBuffer[mutable.ListBuffer[Moves]] = {
     //do a dfs search, input is current path, o/p can be multiple forks.
     //one slice rotation can cover a difference o n, most can be captured by depth of 4.
     //never use same move 3 times in conjunction as its possible to do an opposite move to get same effect

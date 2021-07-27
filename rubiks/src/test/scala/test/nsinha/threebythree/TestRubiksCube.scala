@@ -69,8 +69,8 @@ class TestRubiksCube extends AnyFunSpec {
     val derangedCubes = rubik.findDisarrangedCubes()
     val cube1 = derangedCubes(0)
     val cube2 = derangedCubes(5)
-    val listOfPaths_1 = rubik.findFixForCube(cube1).toList.map(x => x.toList)
-    val listOfPaths_2 = rubik.findFixForCube(cube2).toList.map(x => x.toList)
+    val listOfPaths_1 = rubik.findFixForCube(cube1, 6).toList.map(x => x.toList)
+    val listOfPaths_2 = rubik.findFixForCube(cube2, 6).toList.map(x => x.toList)
 
     val nextMove = rubik.findMostCommonFix(Map(cube1 -> listOfPaths_1, cube2 -> listOfPaths_2))
     assert(nextMove.nonEmpty)
@@ -84,7 +84,7 @@ class TestRubiksCube extends AnyFunSpec {
     val derangedCubes = rubik.findDisarrangedCubes()
 
     val moves = for (cube <- derangedCubes) yield {
-      val listPaths = rubik.findFixForCube(cube).toList.map(_.toList)
+      val listPaths = rubik.findFixForCube(cube, 6).toList.map(_.toList)
       cube -> listPaths
     }
     val nextMove = rubik.findMostCommonFix(moves.toMap)
@@ -100,7 +100,7 @@ class TestRubiksCube extends AnyFunSpec {
     assert (derangedCubes.size == 9)
 
     val moves = for (cube <- derangedCubes) yield {
-      val listPaths = rubik.findFixForCube(cube).toList.map(_.toList)
+      val listPaths = rubik.findFixForCube(cube, 6).toList.map(_.toList)
       cube -> listPaths
     }
     val nextMove = rubik.findMostCommonFix(moves.toMap)
@@ -117,7 +117,7 @@ class TestRubiksCube extends AnyFunSpec {
     assert (derangedCubes.size == 18)
 
     var moves = derangedCubes.foldLeft(new mutable.HashMap[Cube, List[List[Moves]]]) { (Z, cube) =>
-      val listPaths = rubik.findFixForCube(cube).toList.map(_.toList)
+      val listPaths = rubik.findFixForCube(cube, 6).toList.map(_.toList)
       Z(cube) = listPaths
       Z
     }.toMap
@@ -131,7 +131,7 @@ class TestRubiksCube extends AnyFunSpec {
     assert (derangedCubes.size == 9)
 
     moves = derangedCubes.foldLeft(new mutable.HashMap[Cube, List[List[Moves]]]) { (Z, cube) =>
-      val listPaths = rubik.findFixForCube(cube).toList.map(_.toList)
+      val listPaths = rubik.findFixForCube(cube, 6).toList.map(_.toList)
       Z(cube) = listPaths
       Z
     }.toMap

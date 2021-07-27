@@ -150,6 +150,10 @@ object Utilities {
       c.currY != c.origY || c.currZ != c.origZ
   }
 
+  def isCubeDislocated(c: Cube): Boolean = {
+      c.currX != c.origX || c.currY != c.origY || c.currZ != c.origZ
+  }
+
   def printDerangedCubes(r: RubiksCube): Unit = {
     val n = r.n
     val deranged = r.findDisarrangedCubes().toSet
