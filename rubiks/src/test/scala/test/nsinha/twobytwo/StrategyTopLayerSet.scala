@@ -132,7 +132,8 @@ class StrategyTopLayerSet extends AnyFunSpec {
 
   it("power of moves 3 of type FRF' D2") {
     val rubik = RubiksCube(2)
-    val moves: Array[RubiksCube => Unit] = Array(doFRFt _, doD _, doFRFt _, doD _, doFRFt _, doD _)
+    val moves: Array[RubiksCube => Unit] = Array(doFRFt _, doD _, doFRFt _, doD _, doFRFt _, doD _, doL _, doL _,
+      doFRFt _, doD _, doFRFt _, doD _, doFRFt _, doD _, doL _)
     moves.foreach(_(rubik))
     rubik.findDisarrangedCubes().map(c => println(c))
     println()
