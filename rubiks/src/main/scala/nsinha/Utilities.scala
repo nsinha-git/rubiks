@@ -165,8 +165,6 @@ object Utilities {
         if (a._1 > b._1) return 1
         if (a._2 > b._2) return 1
         if (a._3 > b._3) return 1
-
-
         0
       }
     }
@@ -198,6 +196,51 @@ object Utilities {
     println()
 
   }
+
+  def printDerangedPermCycles(rubiks: RubiksCube): Set[Set[(Int, Int, Int)]]= {
+    val cubes: Set[Cube] = rubiks.findDisarrangedCubes().toSet
+    val res = mutable.ListBuffer[mutable.Set[(Int, Int, Int)]]()
+    val que = cubes.toList
+    for (i <- Range(0, que.size)) {
+      val cube = que(i)
+      val t = res.forall(x => !x.contains((cube.origX, cube.origY, cube.origZ)))
+      val q = res.forall(x => !x.contains((cube.currX, cube.currY, cube.currZ)))
+      if (t & q) { //none conatins this cube or its curr pos
+        val newEntry = mutable.Set[(Int, Int, Int)]()
+        newEntry += ((cube.origX, cube.origY, cube.origZ))
+        newEntry += ((cube.currX, cube.currY, cube.currZ))
+        res += newEntry
+      } else { //one of them contains entry.
+        res.foreach { x =>
+          if (x.contains((cube.origX, cube.origY, cube.origZ))) {
+            x += ((cube.currX, cube.currY, cube.currZ))
+          } else if (x.contains((cube.currX, cube.currY, cube.currZ))) {
+            x += ((cube.origX, cube.origY, cube.origZ))
+          } else {
+            //this x does not contain cube or its current pos. ignore
+          }
+        }
+      }
+    }
+    //merge res entries if they have any common
+    for (i <- Range(0,res.size)) {
+      val currSet = res(i)
+      for (j <- Range(i+1, res.size)) {
+        if (res(j).intersect(currSet).nonEmpty) {
+          res(j).foreach(y => currSet += y)
+          res(j).clear()
+        }
+      }
+    }
+    val res1 = res.filter(x => x.nonEmpty).map(x => x.toSet).toSet
+    println("PERM CYCLES <")
+    res1.foreach(println(_))
+    println("PERM CYCLES/>")
+    res1
+
+  }
+
+
 
   def getSlice(axis: Int, idxAxis: Int, n: Int) = {
     //n^2 cubes in motion
