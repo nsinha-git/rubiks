@@ -1,0 +1,177 @@
+package common
+
+import scala.collection.mutable.ListBuffer
+
+/**
+ * create 2 d tree for represnting points like
+ * (1,2), (3,4) etc. We can have existence problem like give me if a point exists or not.
+ * Or set of points less that (3,4). or more than (1,2).
+ *
+ *
+ * Q1. Find points larger than (x,y)
+ * Q2. Find points lesser than (x,y)
+ */
+sealed trait Comparison
+object GREATER extends Comparison
+object LESSER extends Comparison
+object ALL extends Comparison
+object EQUAL extends Comparison
+
+class KdTreeNode() {
+  var pt: KdPoint = _
+  var lh: Int = 0
+  var rh: Int = 0
+  var left: KdTreeNode = _
+  var right: KdTreeNode = _
+  var level: Int = 0
+}
+case class KdPoint(x: Int, y: Int) extends Ordered[KdPoint] {
+  def toArray: Array[Int] = {
+    Array(x,y)
+  }
+
+  override def equals(obj: Any): Boolean = {
+    if (obj.isInstanceOf[KdPoint]) {
+      val other = obj.asInstanceOf[KdPoint]
+      if (other.x == this.x && other.y == this.y) {
+        true
+      } else {
+        false
+      }
+    } else {
+      false
+    }
+  }
+
+  override def compare(that: KdPoint): Int = {
+    if (this == that) {
+      0
+    } else if (this.x == that.x) {
+      if (this.y < that.y) -1 else 1
+    } else if (this.y == that.y) {
+      if (this.x < that.x) -1 else 1
+    } else if (this.x > that.x && this.y > that.y) 1 else -1
+  }
+}
+class KdTree {
+  private var root: KdTreeNode = null
+  private val dims = 2
+
+  private def newKdTreeNodeFromPoint(point: KdPoint): KdTreeNode = {
+    val node = new KdTreeNode()
+    node.pt = point
+    node
+  }
+
+  def insert(point: KdPoint): Unit = {
+    if (root == null) {
+      root = newKdTreeNodeFromPoint(point)
+    } else {
+      insertToParent(point, root);
+    }
+  }
+
+  private def insertToParent(point: KdPoint, node: KdTreeNode): Int = {
+    val dim: Int = (node.level % dims)
+    var depthIncreased = 0
+
+
+    val pValAtDim = point.toArray(dim)
+
+    if (pValAtDim <= node.pt.toArray(dim)) {
+      if (pValAtDim == node.pt.toArray(dim)) {
+        if (point == node.pt) {
+          return depthIncreased
+        }
+      }
+      if (node.left != null) {
+        val didDepthIncrease = insertToParent(point, node.left)
+        node.lh += didDepthIncrease
+        if (didDepthIncrease == 1) {
+          depthIncreased = 1
+        }
+      } else {
+        val newNode = newKdTreeNodeFromPoint(point)
+        newNode.level = node.level + 1
+        node.left = newNode
+        node.lh += 1
+        if (node.right == null) {
+          depthIncreased = 1
+        }
+
+      }
+    } else if (pValAtDim > node.pt.toArray(dim)) {
+      if (node.right != null) {
+        val didDepthIncrease = insertToParent(point, node.right)
+        node.rh += didDepthIncrease
+        if (didDepthIncrease == 1) {
+          depthIncreased = 1
+        }
+      } else {
+        val newNode = newKdTreeNodeFromPoint(point)
+        newNode.level = node.level + 1
+        node.right = newNode
+        node.rh += 1
+        if (node.left == null) {
+          depthIncreased = 1
+        }
+      }
+
+    }
+    depthIncreased
+  }
+
+
+  def findPointsFromGivenPoint(point: KdPoint, comparison: Comparison, node: KdTreeNode, res: ListBuffer[KdPoint]): Unit = {
+    val dim: Int = (node.level % dims)
+    comparison match {
+      case EQUAL =>
+        if (point == node.pt) {
+          res += node
+        } else if (point > node.pt) {
+          findPointsFromGivenPoint(point, comparison, node.right, res)
+        } else {
+          findPointsFromGivenPoint(point, comparison, node.left, res)
+        }
+      case ALL =>
+        res += node
+        findPointsFromGivenPoint(point, comparison, node.left, res)
+        findPointsFromGivenPoint(point, comparison, node.right, res)
+      case LESSER =>
+        if (point >= node.pt) {
+          res += node
+          findPointsFromGivenPoint(point, ALL, node.left, res)
+          findPointsFromGivenPoint(point, comparison, node.right, res)
+        } else {
+          findPointsFromGivenPoint(point, comparison, node.left, res)
+        }
+
+      case GREATER =>
+        if (point <= node.pt) {
+          res += node
+          findPointsFromGivenPoint(point, comparison, node.left, res)
+          findPointsFromGivenPoint(point, ALL, node.right, res)
+        } else {
+          findPointsFromGivenPoint(point, comparison, node.right, res)
+        }
+    }
+
+  }
+}
+
+
+object KdTree extends App{
+  val kdTree = new KdTree
+
+  kdTree.insert(KdPoint(0,0))
+  kdTree.insert(KdPoint(0,0))
+  kdTree.insert(KdPoint(5,0))
+  kdTree.insert(KdPoint(0,5))
+  kdTree.insert(KdPoint(-1,0))
+  kdTree.insert(KdPoint(-1,-1))
+  kdTree.insert(KdPoint(-5,-1))
+  kdTree.insert(KdPoint(5,-1))
+  kdTree.insert(KdPoint(6,-3))
+
+
+}

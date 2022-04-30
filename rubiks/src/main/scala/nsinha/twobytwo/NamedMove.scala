@@ -36,6 +36,15 @@ object DoFRFt extends NamedMove {
   }
 }
 
+
+object DoLFLt extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit =  {
+    DoL.doMove(rubik)
+    DoF.doMove(rubik)
+    DoLt.doMove(rubik)
+  }
+}
+
 object DoFRFtt extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
     DoFt.doMove(rubik)

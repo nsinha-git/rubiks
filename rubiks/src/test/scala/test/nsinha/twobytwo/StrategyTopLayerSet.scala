@@ -2,7 +2,7 @@ package test.nsinha.twobytwo
 
 import nsinha.Utilities.{mapToAxes, printDerangedCubes, printDerangedPermCycles}
 import nsinha.twobytwo.NamedMove.opposite
-import nsinha.twobytwo.{DoD, DoDt, DoFRFt, DoL, DoLt, DoR}
+import nsinha.twobytwo.{DoB, DoBt, DoD, DoDt, DoF, DoFRFt, DoFRFtt, DoFt, DoL, DoLFLt, DoLt, DoR, DoRt, DoT, DoTt}
 import nsinha.{Cube, Evaluation, MinusXOrientation, MinusZOrientation, MovedCube, Moves, RubiksCube, XAxis, XOrientation, YAxis, YOrientation, ZAxis, ZOrientation}
 import org.scalatest.funspec.AnyFunSpec
 
@@ -12,62 +12,9 @@ import scala.collection.mutable.ListBuffer
 
 class StrategyTopLayerSet extends AnyFunSpec {
 
-  it("test top set") {
-    val rubik = new RubiksCube(2)
-    val listOfResets = List(MovedCube(0,1,0,1,1,0,ZOrientation,YOrientation,MinusXOrientation),
-      MovedCube(1,1,0,1,1,1,ZOrientation,YOrientation,MinusXOrientation), MovedCube(0,1,1,0,1,0,XOrientation,MinusZOrientation,YOrientation),
-      MovedCube(1,1,1,0,1,1,ZOrientation,YOrientation,MinusXOrientation))
-    rubik.ressetCube(listOfResets)
-    printDerangedCubes(rubik)
-    val res = rubik.findDisarrangedCubes().headOption map { c =>
-      val cubeAllFixes =  rubik.findFixForCube(c, 14).toList.map(x => x.toList)
-      (c, cubeAllFixes.map(x => (x, x.foldLeft("")((z,y) => z + y.toString))))
-    }
-
-
-    println(res.get._2.size)
-
-
-   /* val derangedCubes =  rubik.findDisarrangedCubes().foldLeft (mutable.Set[Cube]()) { (Z,c) =>
-      Z += c
-      Z
-    }.toSet
-    //so we have many cubes each has a set of moves that can correct it whithe their string rep/
-    //what moves can be common among them.if their string rep matches
-    val mapHashToCubes = mutable.HashMap[String, mutable.Set[Cube]]()
-    val mapHashResolver = mutable.HashMap[String, List[Moves]]()
-    res.foreach { x =>
-      val c = x._1
-      x._2.foreach { y =>
-        val moves = y._1
-        val hash = y._2
-        if (!mapHashResolver.contains(hash)) {
-          mapHashResolver(hash) = moves
-        }
-        if (!mapHashToCubes.contains(hash)) {
-          mapHashToCubes(hash) = mutable.Set[Cube]()
-        }
-        mapHashToCubes(hash) += c
-      }
-    }
-
-    val commonMoves = mapHashToCubes.foldLeft(mutable.Set[String]()) { (Z, entry) =>
-      if (entry._2.toSet == derangedCubes) {
-        Z += entry._1
-      }
-      Z
-    }.map(x => mapHashResolver(x))
-
-    println(commonMoves) */
-  }
-
-
-
-
-
-  it("power of moves 3 of type FRF' D2") {
+  it("moves for perm of cycle 2") {
     val rubik = RubiksCube(2)
-    val moves = Array(DoFRFt, DoD, DoFRFt, DoDt, DoR)
+    val moves = Array(DoFRFt, DoD, DoFRFt, DoDt, DoR, DoFRFt, DoD, DoFRFt, DoDt, DoR, DoFRFt, DoD, DoFRFt, DoDt, DoR)
 
     moves.foreach(_.doMove(rubik))
     rubik.findDisarrangedCubes().map(c => println(c))
@@ -78,8 +25,158 @@ class StrategyTopLayerSet extends AnyFunSpec {
     printDerangedCubes(rubik)
     printDerangedPermCycles(rubik)
     println()
+    //Set((1,0,1), (1,1,0))
 
   }
+
+
+  it("moves for perm of cycle 2-2") {
+    val rubik = RubiksCube(2)
+    val moves = Array(DoFRFt, DoL, DoFRFt, DoFRFt, DoL, DoFRFt, DoFRFt, DoL, DoFRFt, DoFRFt, DoL, DoFRFt, DoFRFt, DoL, DoFRFt)
+    moves.foreach(_.doMove(rubik))
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    rubik.findDisarrangedByPosCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+
+    //Set((0,1,1), (1,0,0))
+
+  }
+
+  it("moves for perm of perms -2 x 5  ") {
+    val rubik = RubiksCube(2)
+    val moves = Array(DoFRFt, DoL, DoFRFt)
+    moves.foreach(_.doMove(rubik))
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    rubik.findDisarrangedByPosCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+    //HashSet((1,1,0), (0,0,0), (0,0,1), (0,1,0), (1,1,1))
+    //Set((0,1,1), (1,0,0))
+
+  }
+
+  it("moves for perm of perms -1 x 4 1 ") {
+    val rubik = RubiksCube(2)
+    val moves = Array(DoFRFt, DoR, DoFRFt)
+    moves.foreach(_.doMove(rubik))
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    rubik.findDisarrangedByPosCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+    //Set((1,0,0))
+    //Set((0,1,1), (1,0,1), (1,1,1), (1,1,0))
+  }
+
+  it("moves for perm of perms -1 x 4 1  4 times") {
+    val rubik = RubiksCube(2)
+    val moves = Array(DoFRFt, DoR, DoFRFt)
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    moves.foreach(_.doMove(rubik))
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    rubik.findDisarrangedByPosCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+    //Set((1,0,0))
+    //Set((0,1,1), (1,0,1), (1,1,1), (1,1,0))
+  }
+
+  it("moves for perm of perms 4") {
+    val rubik = RubiksCube(2)
+    val moves = Array(DoR, DoFRFt, DoRt)
+    moves.foreach(_.doMove(rubik))
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    rubik.findDisarrangedByPosCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+    //Set((0,1,1), (1,0,1), (1,1,1), (1,1,0))
+  }
+
+  it("moves for perm of perms 6 ") {
+    val rubik = RubiksCube(2)
+    val moves = Array(DoFRFt, DoR, DoFRFtt)
+    moves.foreach(_.doMove(rubik))
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    rubik.findDisarrangedByPosCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+    //HashSet((1,1,0), (1,0,1), (0,1,1), (1,1,1), (1,0,0), (0,0,1))
+  }
+
+
+  it("moves for perm of perms ... ") {
+    val rubik = RubiksCube(2)
+    var moves = Array(DoFRFt, DoR, DoFRFtt)
+    moves.foreach(_.doMove(rubik))
+    moves = Array(DoR, DoFRFt, DoRt)
+    moves.foreach(_.doMove(rubik))
+
+
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    rubik.findDisarrangedByPosCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+    //HashSet((1,1,0), (1,0,1), (0,1,1), (1,1,1), (1,0,0), (0,0,1))
+  }
+
+
+  it("moves for perm of perms 1 ") {
+    val rubik = RubiksCube(2)
+    //L T L' T L T2 L'
+    var moves = Array(DoL, DoT, DoLt, DoT, DoL, DoT, DoT, DoLt)
+    moves.foreach(_.doMove(rubik))
+    rubik.findDisarrangedCubes().map(c => println(c))
+    println()
+    println(rubik.getMovesMap())
+    printDerangedCubes(rubik)
+    printDerangedPermCycles(rubik)
+    println()
+    //HashSet((1,1,0), (1,0,1), (0,1,1), (1,1,1), (1,0,0), (0,0,1))
+  }
+
+
+
+
+
+
 
 
 

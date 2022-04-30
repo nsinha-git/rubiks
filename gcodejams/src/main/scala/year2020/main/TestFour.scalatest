@@ -1,0 +1,131 @@
+package year2020.main
+
+import java.util
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
+/**
+ * Problem
+ * Lauren is trying to play the most beautiful notes possible using a harp. The harp is a circle with a radius of R centimeters. To play a note, a cord must be attached to the harp in a way that connects two different attachment points on the perimeter of the circle. Lauren then plucks this cord to play a note.
+ * There are N attachment points on the perimeter of the circular harp at which a cord can be attached. The i-th such attachment point is at a location that is Di nanodegrees (a nanodegree is 10-9 degrees) clockwise around the perimeter of the circular harp, starting from the rightmost point on the perimeter.
+ * Not all attachment points use the same technology to properly fix the cords onto them. The i-th attachment point requires Li centimeters of cord to be used for attaching. A cord fixed between two different attachment points i and j needs to be exactly Li + Lj + distance(i, j) centimeters long. By distance(i, j) we mean the length of the geometric chord connecting the i-th and j-th attachment points, that is, the Euclidean distance between the two points.
+ * Lauren thinks that notes sound better when they come from longer cords. What are the K longest cords that can be used with Lauren's harp?
+ *
+ */
+
+/**
+ * ∑-w ø-o π-P ß=s ∂=d ∆=j Ω=z √=v µ=mu
+ * o(n^2logk) solution is obvious
+ * 0. if n<1000, do above.
+ * 1.a. subtract the min harp from every one.
+ * 1. Find the highest length of harm (L). chosee a 0 such that R0 = 1. Choose a D=(360/0) if D>1000 D=1000.
+ * 2. Arrange the points in increasing angle.
+ * 3. Create D angles (0,360/D,2*360/D, ... 366-360/D) as segment rep of points falling from p to p+360/D exclusive on right.
+ * 4. For each segment represent it by its highest value,
+ * 5. Do DC2 calculations and find distance based on 1 criterias. assume the max harp for a region is located at middle.
+ * 6. Choose K candidates
+ * 7. calculate the Ds that are members. Consider points in that region only.
+ * 8.Get K highest points from each D and  We have DK points.
+ * 9.We can search in DkC2 now.
+ * 10. Is DKC2 good enuf. As D=1000 and K=2 so DK=10^4
+ *
+ *
+ */
+class TestFour {
+  type NanoDegree=Long
+  case class TestCase(N: Int, R: Double, K: Int, harps:List[(NanoDegree, Int)])
+  val D = 1000
+  def process(testCase: TestCase): Unit = {
+    val minLen = testCase.harps.map(_._2).min
+    val maxLen = testCase.harps.map(_._2).max
+    val harpsGroups: Map[NanoDegree, List[(NanoDegree, Int)]] = generateDSplits(testCase.harps)
+    val harpsGroupsWithMaxLen: Map[NanoDegree, (List[(NanoDegree, Int)], Int)] = harpsGroups.map(x => x._1 -> (x._2, x._2.map(_._2).max))
+
+    val harpGroups: Set[NanoDegree] = chooseRegionsThatHavePromise(harpsGroupsWithMaxLen, testCase.K, testCase.R)
+
+    val harpsToConsider: List[(NanoDegree, Int)] = getHarps(harpGroups, harpsGroups)
+    val distances: List[Double] = doFullSearch(harpsToConsider, testCase.K, testCase.R)
+    println(distances)
+  }
+
+  def doFullSearch(harps: List[(TestFour.this.NanoDegree, Int)], k: Int, R: Double) = {
+    val pq = new mutable.PriorityQueue[Double]()
+    for (harp <- harps) {
+      for (harp1 <- harps if harp._1 != harp1._1) {
+        pq += getDistance(harp._1, harp1._1, harp._2, harp1._2, R)
+        if (pq.length > k) {
+          pq.dequeue()
+        }
+      }
+    }
+    pq.toList
+
+  }
+
+  def generateDSplits(harps: List[(NanoDegree, Int)]): Map[NanoDegree, List[(NanoDegree, Int)]] = {
+    val res = new mutable.HashMap[NanoDegree, ListBuffer[(NanoDegree, Int)]]()//
+    Range(0, D).foreach{x => res(x.toInt) =  ListBuffer[(NanoDegree, Int)]()}
+    harps.foreach(harp => res(math.floor(harp._1*1.0/D).toInt) += harp)
+
+    res.map(x => x._1 -> x._2.toList).toMap
+  }
+
+  def chooseRegionsThatHavePromise(harps: Map[NanoDegree, (List[(NanoDegree, Int)], Int)], k: Int, R: Double) = {
+    val span = 360.0/D;
+    implicit val ordering = new Ordering[((NanoDegree, NanoDegree), Int)] {
+
+      override def compare(x: ((NanoDegree, NanoDegree), Int), y: ((NanoDegree, NanoDegree), Int)): Int = {
+        val ord  = implicitly[Ordering[Int]]
+         ord.compare(x._2,y._2)
+      }
+    }
+    val pq = new mutable.PriorityQueue[((NanoDegree, NanoDegree), Int)]()
+    for (harp1 <- harps) {
+      val ag1 = harp1._1
+      for (harp2 <- harps if harp1._1 != harp2._1) {
+        val ag2 = harp2._1
+        val distance = getDistance(ag1, ag2, harp1._2._2, harp2._2._2, R)
+        if (ag1 > ag2) {
+          pq += ((ag1, ag2), distance)
+        } else {
+          pq += ((ag2, ag1), distance)
+        }
+        if (pq.length > 4*k) {
+          pq.dequeue()
+        }
+      }
+    }
+    val res = mutable.HashSet[NanoDegree]()
+    pq.toList.foreach {
+      x => res += x._1._1
+        res += x._1._2
+    }
+    res toSet
+  }
+
+  def getDistance(ag1: NanoDegree, ag2: NanoDegree, l1: Int, l2: Int, R: Double) = {
+    val diff =  {
+      var r = math.abs(ag2 - ag1)
+      if (r > 180) {
+        r = 360 - r
+      }
+      r
+    }
+    math.sin(diff/2)*2*R + l1 + l2
+  }
+
+  def getHarps(selectHarpGroups: Set[NanoDegree], harpGroupLists: Map[NanoDegree, List[(NanoDegree, Int)]]) = {
+    val res = mutable.ListBuffer[(NanoDegree, Int)]()
+    harpGroupLists.filter(x => selectHarpGroups.contains(x._1)).foreach(x => x._2.foreach(res += _))
+    res.toList
+
+  }
+}
+
+object TestFour {
+  val test1 = 0
+  val test = test1
+
+
+
+}

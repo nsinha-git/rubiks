@@ -1,0 +1,217 @@
+package year2020.main
+
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
+class TestFive(word: String, transitions: List[(Char, Char)]) {
+  /**
+   * Banana Rocks Inc is coming up with a revolutionary technology to perform the common edit operation "replace all". Their implementation replaces
+   * every occurrence of a character within a given text with another character. (If the character does not appear in the text, then the operation
+   * occurs but has no effect.)
+   *  For example, if the starting text is CODEJAMWORLDFINALS and an operation is performed to replace A with O, the new text would be CODEJOMWORLDFINOLS.
+   *  If another operation is performed on that result to replace O with Y, the final text would be CYDEJYMWYRLDFINYLS.
+   *  Unfortunately, the implementation is incomplete, so it can only perform replacements from a specific list of N pairs of characters. Also, even if a
+   *  replacement of a specific character c1 with another character c2 is implemented, the reverse replacement of c2 with c1 may or may not be implemented.
+   *  You want to try all the implemented replacements. You are given some initial string S to use as the initial text. You can perform any number of
+   *  replacements in sequential order: the first replacement is performed on S, and the (i+1)-th replacement is performed on the result of performing
+   *  the i-th replacement. The only requirement is that each implemented replacement is performed at least once during this process. There is no upper
+   *  limit on how many times you may perform each replacement.
+   *  The allowed characters are decimal digits and uppercase and lowercase English alphabet letters. In this problem, uppercase and lowercase versions of
+   *  the same letter are treated as distinct characters.
+   *  What is the maximum number of unique characters that can appear in a text that is the result of the last replacement performed?
+   *  Input
+   *  The first line of the input gives the number of test cases, T. T test cases follow. Each test case consists of two lines. The first line contains a
+   *  string S and an integer N: the initial text and the number of implemented replacements. The second line contains N two-character strings
+   *  R1, R2, ..., RN, representing the implemented replacements. Ai and Bi are the first and second characters of Ri, respectively. The i-th implemented
+   *  replacement corresponds to replacing all occurrences of Ai with Bi.
+   *  Output
+   *  For each test case, output one line containing Case #x: y, where x is the test case number (starting from 1) and y is the maximum number of unique
+   *  characters that can appear in a text that is the result of performing all implemented replacements to S one or more times each, in some order.
+   *  Limits
+   *  Time limit: 60 seconds per test set.
+   *  Memory limit: 1GB.
+   *  1 ≤ T ≤ 100.
+   *  2 ≤ length of S ≤ 1000, for all i.
+   *  Each character of S is an uppercase or lowercase English alphabet letter or a decimal digit.
+   *  Ai is an uppercase or lowercase English alphabet letter or a decimal digit, for all i.
+   *  Bi is an uppercase or lowercase English alphabet letter or a decimal digit, for all i.
+   *  Ai ≠ Bi, for all i.
+   *  (Ai, Bi) ≠ (Aj, Bj), for all i ≠ j. (Each replacement is unique.)
+   *  Test Set 1 (Visible Verdict)
+   *  2 ≤ N ≤ 62.
+   *  Bi ≠ Bj, for all i ≠ j.
+   *  Test Set 2 (Hidden Verdict)
+   *  2 ≤ N ≤ 62 × 61.
+   *  Sample
+   *
+   *  Input
+   *
+   *  Output
+   *
+   *  4
+   *  CODEJAMWORLDFINALS 2
+   *  AO OY
+   *  xyz 3
+   *  xy zx yz
+   *  CJ 4
+   *  20 2O HC KS
+   *  AB 2
+   *  Ab bA
+   *
+   *
+   *  Case #1: 14
+   *  Case #2: 2
+   *  Case #3: 2
+   *  Case #4: 2
+   *
+   *
+   *
+   */
+
+  /**
+   * Solution;
+   * 1.Create a graph of transitions.
+   *   a. find all circular CS and assign them value 0 and attribute to a hash of nodes in circular travel e.g hash(a,b,c) if a,b,c are involved
+   *      b. if a single node can be resassigned by a then assign all of them a union of (ab,c) and (a,d,e).
+   *      c. After exhausting a. and b. we have some nodes valued at 0 and a hash attribute.
+   *      d. Start with unvisited node and do a dfs. It can end in two ways a node which is has level value 0 or it leads to no further depth. In case of level 0,
+   *      move up and keep setting the levels to L+1 starting at 0 passing the attribute of 0. in second case, do similar but attribute is hashof group.
+   *      e. Exhaust d.
+   *      f. We should have all nodes having level value and attribute value.
+   *      g. Enumerate the attribute values.
+   *      h. Look at the input. Replace the element by their attribute value.
+   *   i. Uniquefy h and count it. Pass it as result
+   */
+
+  def solve(): Int = {
+
+    val nodes = {
+      val _nodes = mutable.ListBuffer[Char]()
+      for (elem <- transitions) {
+        nodes += elem._1; nodes += elem._2
+      }
+      _nodes.toList
+    }
+
+    val graph = createGraph(nodes)
+    val nodesToConnectedComponent = mutable.HashMap[Char, mutable.HashSet[ConnectedComponent]]()
+    val nodesToNodes = mutable.HashMap[Char, mutable.HashSet[Char]]()
+
+
+
+    val connectedComponetsGraph: Map[ConnectedComponent, Set[ConnectedComponent]] = createConnectedComponents(graph, nodesToConnectedComponent, nodesToNodes)
+
+    //we have a few Ccs and few chars that lead into cc's.SO we can break down a word into cc's.
+    //there are some chars still left which dont lead to any cc.For those make a list of those transitions and apply them one at a time in any order.
+    //3.process the given word under ccs.
+
+
+    //val result: Int = parseWord(word, connectedComponetsGraph)
+
+
+
+    //
+    // result
+    1
+  }
+
+  def createGraph(nodes: List[Char]) = {
+    val graph = nodes.map(x => x -> new ListBuffer[Char]) toMap
+
+    for (tr <- transitions) {
+      graph(tr._1) += tr._2
+    }
+    graph map (x => x._1 -> x._2.toList)
+  }
+
+  case class ConnectedComponent(elems: Set[Char]) {
+  }
+
+
+  def createConnectedComponents(graph: Map[Char, List[Char]], nodesToConnectedComponent:mutable.HashMap[Char, mutable.HashSet[ConnectedComponent]],
+                                nodesToNodes: mutable.HashMap[Char, mutable.HashSet[Char]]) = {
+    val connectedComponentsMap = mutable.HashMap[ConnectedComponent, mutable.HashSet[ConnectedComponent]]()
+    val nodes = graph.keys.toList
+
+
+    val visited = mutable.HashSet[Char]()
+
+
+    for (node <- nodes if !visited.contains(node)) { //needed as we will visit a rando unvisited node. When this happens its nbrrs in clousure will also get visited.
+      val path = mutable.HashSet[Char]()
+      path += node
+      val currPath =  (mutable.HashSet[Char](), mutable.ListBuffer[Char]())
+      currPath._1 += node
+      currPath._2 += node
+      visited += node
+      doDfs(node, graph, connectedComponentsMap, currPath, visited, nodesToConnectedComponent, nodesToNodes)
+      currPath._1 -= node
+      currPath._2.dropRight(1)
+    }
+    //if cc have a shared element they are connected
+    makeConnectedComponentGraph(connectedComponentsMap, graph)
+    connectedComponentsMap.map{ case (x,y) => x -> y.toSet}.toMap
+  }
+
+  def doDfs(node: Char, graph: Map[Char, List[Char]], componentToComponents: mutable.HashMap[ConnectedComponent, mutable.HashSet[ConnectedComponent]],
+            currPath: (mutable.HashSet[Char], mutable.ListBuffer[Char]), visited: mutable.HashSet[Char], nodesToConnectedComponent: mutable.HashMap[Char, mutable.HashSet[ConnectedComponent]],
+            nodesToNodes: mutable.HashMap[Char, mutable.HashSet[Char]]): Unit = {
+
+    val nbrs = graph(node)
+    for (nbr <- nbrs) { //needed to visit the closure of a node
+      if (!visited.contains(node)) {
+        currPath._1 += nbr
+        currPath._2 += nbr
+        visited += node
+        materializePathToNodeToNodes(currPath, nodesToNodes)
+        doDfs(nbr, graph, componentToComponents, currPath, visited, nodesToNodes)
+        currPath._1 -= nbr
+        currPath._2.dropRight(1)
+      } else { //nbr is already visited so we have a loop.
+        if (currPath._1.contains(nbr)) {
+          val indxOfLoop = currPath._2.indexOf(nbr)
+          val elemsInConnectedSet = currPath._2.takeRight(indxOfLoop).toSet
+          val cc = new ConnectedComponent(elemsInConnectedSet)
+          componentToComponents += cc -> new ListBuffer[ConnectedComponent]
+          //update nodesToConnectedComponent
+          currPath._1.foreach{ x =>
+            if (nodesToConnectedComponent.contains(x)) {
+              nodesToConnectedComponent(x) += cc
+            } else {
+              nodesToConnectedComponent += x -> mutable.HashSet()
+              nodesToConnectedComponent(x) += cc
+            }
+          }
+        }
+      }
+    }
+  }
+
+  def makeConnectedComponentGraph(connectedComponentsMap: mutable.HashMap[ConnectedComponent, mutable.HashSet[TestFive.this.ConnectedComponent]], graph: Map[Char, List[Char]]) = {
+    for (cc <- connectedComponentsMap.keys) {
+      for (cc1 <- connectedComponentsMap.keys if cc.elems != cc1.elems) {
+        if (cc.elems.intersect(cc1.elems).nonEmpty) {
+          connectedComponentsMap(cc) += cc1
+          connectedComponentsMap(cc1) += cc
+        }
+      }
+    }
+  }
+
+  def materializePathToNodeToNodes(path: (mutable.HashSet[Char], ListBuffer[Char]), nodeToNodes: mutable.HashMap[Char, mutable.HashSet[Char]]) = {
+    val state = mutable.HashSet[Char]()
+    for (p <- path._2.reverse) {
+      if (state.nonEmpty) {
+        if (nodeToNodes.contains(p)) {
+          nodeToNodes(p) ++= state
+        } else {
+          nodeToNodes(p) = mutable.HashSet()
+          nodeToNodes(p) ++= state
+        }
+      }
+    }
+  }
+
+
+
+}
