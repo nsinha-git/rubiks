@@ -150,8 +150,57 @@ object Utilities {
       c.currY != c.origY || c.currZ != c.origZ
   }
 
+  def getCubeRotation(c: Cube): List[Int] = {
+   val isCubeRotated =  c.orientX != XOrientation || c.orientY != YOrientation ||
+      c.orientZ != ZOrientation
+    if (isCubeRotated)
+      if (c.orientX == YOrientation || c.orientX == MinusYOrientation) {
+        if(c.orientY == XOrientation || c.orientY == MinusXOrientation) {
+          List(1,2)
+        } else {
+          List(1,2,3)
+        }
+      } else if (c.orientX == ZOrientation || c.orientX == MinusZOrientation) {
+        if(c.orientZ == XOrientation || c.orientZ == MinusXOrientation) {
+          List(1,3)
+        } else {
+          List(1,3,2)
+        }
+      } else {
+        List(2,3)
+      }
+    else
+      List.empty
+  }
+
+
   def isCubeDislocated(c: Cube): Boolean = {
       c.currX != c.origX || c.currY != c.origY || c.currZ != c.origZ
+  }
+
+  def pow2(i: Int, p: Int): Int = {
+    val b = p match {
+      case 0 => 1
+      case 1 => 2
+      case 2 => 4
+    }
+    i * b
+  }
+  def pow256(i: Int, p: Int): Int = {
+    val b = p match {
+      case 0 => 1
+      case 1 => 2*256
+      case 2 => 4*256
+    }
+    i * b
+  }
+  def pow32k(i: Int, p: Int): Int = {
+    val b = p match {
+      case 0 => 1
+      case 1 => 32*1024*2
+      case 2 => 4*32*1024
+    }
+    i * b
   }
 
   def printDerangedCubes(r: RubiksCube): Unit = {
@@ -159,16 +208,12 @@ object Utilities {
     val deranged = r.findDisarrangedCubes().toSet
     val orderingzyx = new Ordering[(Int, Int, Int)]() {
       override def compare(a: (Int, Int, Int), b: (Int, Int, Int)): Int = {
-        if (a._1 < b._1) return -1
-        if (a._2 < b._2) return -1
-        if (a._3 < b._3) return -1
-        if (a._1 > b._1) return 1
-        if (a._2 > b._2) return 1
-        if (a._3 > b._3) return 1
-        0
+        val a_val = pow2(a._1, 0) + pow256(a._2, 1) + pow32k(a._3, 2)
+        val b_val = pow2(b._1, 0) + pow256(b._2, 1) + pow32k(b._3, 2)
+        Ordering[Int].compare(a_val, b_val)
       }
     }
-    val que = mutable.ListBuffer[String]()
+    var que = mutable.ListBuffer[String]()
     //create n^2 slices at z axis and print the pos.
     for (i <- Range(0, n)) {
       val listOfLocs = getSlice(3, i, n).sorted(orderingzyx)
@@ -182,16 +227,24 @@ object Utilities {
     }
 
     var i = 0
+    val stk = mutable.Stack[String]()
+    var nextString  = new StringBuilder()
     while (i < que.size) {
       val el = que(i)
       if (i % n == 0) {
-        println()
+        stk.push(nextString.toString())
+        nextString.clear()
       }
       if (i % (n * n) == 0) {
-        println()
+        stk.push("\n")
       }
-      print(el)
+      nextString.append(el)
       i += 1
+    }
+    stk.push(nextString.toString())
+    while(stk.nonEmpty) {
+      print(stk.pop())
+      println()
     }
     println()
 
@@ -205,7 +258,7 @@ object Utilities {
       val cube = que(i)
       val t = res.forall(x => !x.contains((cube.origX, cube.origY, cube.origZ)))
       val q = res.forall(x => !x.contains((cube.currX, cube.currY, cube.currZ)))
-      if (t & q) { //none conatins this cube or its curr pos
+      if (t & q) { //none contains this cube or its curr pos
         val newEntry = mutable.Set[(Int, Int, Int)]()
         newEntry += ((cube.origX, cube.origY, cube.origZ))
         newEntry += ((cube.currX, cube.currY, cube.currZ))
@@ -233,11 +286,43 @@ object Utilities {
       }
     }
     val res1 = res.filter(x => x.nonEmpty).map(x => x.toSet).toSet
+    val res2 = orderThePermSet(res1, cubes)
+    val res3 = res2 map (list => list.map(x => (x,getCubeRotation(rubiks.getCubeAtLoc(x)))))
     println("PERM CYCLES <")
-    res1.foreach(println(_))
+    res3.foreach(println(_))
     println("PERM CYCLES/>")
     res1
 
+  }
+
+
+
+  def orderThePermSet(unorderedPermSet: Set[Set[(Int, Int, Int)]], cubes: Set[Cube]) = {
+    unorderedPermSet map{ x =>
+      val currListUnOrderedPerm = ListBuffer.from(x.toList)
+      val res = ListBuffer.empty[(Int, Int, Int)]
+      var currEl = currListUnOrderedPerm.remove(0)
+      res += currEl
+      while(currListUnOrderedPerm.nonEmpty) {
+        val nextEl = findNextInLineOfPerm(cubes, currEl)
+        val idx = currListUnOrderedPerm.indexOf(nextEl)
+        currListUnOrderedPerm.remove(idx)
+        currEl = nextEl
+        res += currEl
+      }
+      res.toList
+    }
+  }
+
+  def findNextInLineOfPerm(cubes: Set[Cube], actualPosOfThisCube: (Int, Int, Int)): (Int, Int, Int) = {
+    var res: (Int, Int, Int) = null
+    cubes.foreach(c =>
+      if (c.currX == actualPosOfThisCube._1 && c.currY == actualPosOfThisCube._2 && c.currZ == actualPosOfThisCube._3) {
+        res = (c.origX,c.origY, c.origZ)
+        return res
+      }
+    )
+    res
   }
 
 

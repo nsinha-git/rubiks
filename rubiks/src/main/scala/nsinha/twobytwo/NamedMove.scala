@@ -55,81 +55,166 @@ object DoFRFtt extends NamedMove {
 
 object DoF extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (1, 1, 1)
+    val pos = rubik.frontPos
     rubik.makeMove(YAxis, XAxis, pos)
   }
 }
 
 object DoFt extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (1, 1, 1)
+    val pos = rubik.frontPos
+    rubik.makeMove(XAxis, YAxis, pos)
+  }
+}
+
+object DoMF extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
+    rubik.makeMove(YAxis, XAxis, pos)
+  }
+}
+
+object DoMFt extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
     rubik.makeMove(XAxis, YAxis, pos)
   }
 }
 object DoB extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (0,0,0)
+    val pos = rubik.backPos
     rubik.makeMove(YAxis, XAxis, pos)
   }
 }
 object DoBt extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (0,0,0)
+    val pos = rubik.backPos
+    rubik.makeMove(XAxis, YAxis, pos)
+  }
+}
+object DoMB extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.backPos
+    rubik.makeMove(YAxis, XAxis, pos)
+  }
+}
+object DoMBt extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.backPos
     rubik.makeMove(XAxis, YAxis, pos)
   }
 }
 object DoL extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (0,0,0)
+    val pos = rubik.leftPos
     rubik.makeMove(YAxis, ZAxis, pos)
   }
 }
 
 object DoLt extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (0,0,0)
+    val pos = rubik.leftPos
+    rubik.makeMove(ZAxis, YAxis, pos)
+  }
+}
+
+object DoML extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
+    rubik.makeMove(YAxis, ZAxis, pos)
+  }
+}
+
+object DoMLt extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
     rubik.makeMove(ZAxis, YAxis, pos)
   }
 }
 object DoR extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (1,1,1)
+    val pos = rubik.rightPos
     rubik.makeMove(ZAxis, YAxis, pos)
   }
 }
 object DoRt extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (1,1,1)
+    val pos = rubik.rightPos
+    rubik.makeMove(YAxis, ZAxis, pos)
+  }
+}
+object DoMR extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
+    rubik.makeMove(ZAxis, YAxis, pos)
+  }
+}
+object DoMRt extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
     rubik.makeMove(YAxis, ZAxis, pos)
   }
 }
 object DoT extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (1,1,1)
+    val pos = rubik.topPos
     rubik.makeMove(XAxis, ZAxis, pos)
   }
 }
 
 object DoTt extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (1,1,1)
+    val pos = rubik.topPos
+    rubik.makeMove(ZAxis, XAxis, pos)
+  }
+}
+
+object DoMT extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
+    rubik.makeMove(XAxis, ZAxis, pos)
+  }
+}
+
+object DoMTt extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
     rubik.makeMove(ZAxis, XAxis, pos)
   }
 }
 
 object DoD extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (0,0,0)
+    val pos = rubik.downPos
     rubik.makeMove(ZAxis, XAxis, pos)
   }
 }
 
 object DoDt extends NamedMove {
   override def doMove(rubik: RubiksCube): Unit = {
-    val pos = (0,0,0)
+    val pos = rubik.downPos
     rubik.makeMove(XAxis, ZAxis, pos)
   }
 }
+
+object DoMD extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
+    rubik.makeMove(ZAxis, XAxis, pos)
+  }
+}
+
+object DoMDt extends NamedMove {
+  override def doMove(rubik: RubiksCube): Unit = {
+    val pos = rubik.middlePos
+    rubik.makeMove(XAxis, ZAxis, pos)
+  }
+}
+
+
+
+
+
 
 
 

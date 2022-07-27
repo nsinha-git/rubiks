@@ -15,6 +15,14 @@ case class RubiksCube(n: Int) {
   private [nsinha] val numMoves = mutable.HashMap[(Int, Int, Int), Int]()
   val allPos = getAllPos(n)
 
+  var frontPos = (0,0,0)
+  var backPos = (0,0,0)
+  var leftPos = (0,0,0)
+  var rightPos = (0,0,0)
+  var topPos = (0,0,0)
+  var downPos = (0,0,0)
+  var middlePos = (0,0,0)
+
   createRubix()
 
   //make a copy of this instance
@@ -48,6 +56,27 @@ case class RubiksCube(n: Int) {
           posMap((x, y, z)) = cube
           revPosMap(cube) = (x, y, z)
         }
+
+    if (n == 2) {
+      frontPos = (1, 1, 1)
+      backPos = (0, 0, 0)
+      leftPos = (0, 0, 0)
+      rightPos = (1, 1, 1)
+      topPos = (1, 1, 1)
+      downPos = (0, 0, 0)
+      middlePos = (1, 1, 1)
+    } else if (n == 3) {
+      frontPos = (2, 2, 2)
+      backPos = (0, 0, 0)
+      leftPos = (0, 0, 0)
+      rightPos = (2, 2, 2)
+      topPos = (2, 2, 2)
+      downPos = (0, 0, 0)
+      middlePos = (1, 1, 1)
+
+    }
+
+
   }
 
   def getMovesMap() = {
@@ -307,6 +336,7 @@ case class RubiksCube(n: Int) {
     }
     t.foreach(_())
   }
+
 }
 
 
